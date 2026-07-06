@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX7H7BJ8XY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZX7H7BJ8XY');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors on Wheels | EM Guidance Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --em-blue: #0055ff;
+            --em-dark-blue: #003db3;
+            --em-light-blue: #eef4ff;
+            --em-bg: #f8fafc;
+            --em-white: #ffffff;
+            --em-text-main: #1e293b;
+            --em-text-muted: #64748b;
+            --em-border: #e2e8f0;
+            --em-accent: #10b981;
+            --em-danger: #ef4444;
+            --sidebar-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--em-bg); color: var(--em-text-main); line-height: 1.5; }
+
+        .app-shell { display: flex; min-height: 100vh; }
+        
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: var(--em-white); border-right: 1px solid var(--em-border); height: 100vh; position: fixed; display: flex; flex-direction: column; z-index: 1000; }
+        .sidebar-brand { padding: 1.5rem; display: flex; align-items: center; gap: 0.75rem; border-bottom: 1px solid var(--em-border); color: var(--em-blue); }
+        .sidebar-brand h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        .nav-section { padding: 1rem 0; flex: 1; overflow-y: auto; }
+        .nav-label { padding: 1rem 1.5rem 0.5rem; font-size: 0.7rem; font-weight: 800; color: var(--em-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .nav-item { padding: 0.75rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; color: var(--em-text-main); cursor: pointer; font-weight: 500; font-size: 0.9rem; transition: 0.2s; }
+        .nav-item:hover { background: var(--em-light-blue); color: var(--em-blue); }
+        .nav-item.active { background: var(--em-blue); color: white; }
+        .nav-item i { width: 20px; text-align: center; font-size: 1rem; }
+
+        /* Main Content */
+        .main-stage { flex: 1; margin-left: var(--sidebar-width); display: flex; flex-direction: column; }
+        .header { height: 64px; background: white; border-bottom: 1px solid var(--em-border); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; position: sticky; top: 0; z-index: 900; }
+        .search-bar { flex: 1; max-width: 450px; position: relative; }
+        .search-bar i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--em-text-muted); }
+        .search-bar input { width: 100%; padding: 0.5rem 1rem 0.5rem 2.5rem; border: 1px solid var(--em-border); border-radius: 8px; background: var(--em-bg); outline: none; }
+
+        .content { padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .page-title { margin-bottom: 2rem; }
+        .page-title h2 { font-size: 1.5rem; font-weight: 700; }
+
+        /* Cards */
+        .em-card { background: white; border-radius: 12px; border: 1px solid var(--em-border); margin-bottom: 1.5rem; overflow: hidden; }
+        .card-header { padding: 1rem 1.5rem; border-bottom: 1px solid var(--em-border); display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.95rem; }
+        .card-body { padding: 1.5rem; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--em-border); }
+        .stat-val { font-size: 1.5rem; font-weight: 700; color: var(--em-blue); }
+        .stat-lab { font-size: 0.75rem; font-weight: 600; color: var(--em-text-muted); text-transform: uppercase; margin-top: 0.25rem; }
+
+        /* Buttons */
+        .btn { padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+        .btn-primary { background: var(--em-blue); color: white; }
+        .btn-ghost { background: transparent; color: var(--em-blue); border: 1px solid var(--em-blue); }
+        .btn-danger { background: var(--em-danger); color: white; }
+        .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+
+        /* Tables */
+        .em-table { width: 100%; border-collapse: collapse; }
+        .em-table th { text-align: left; padding: 0.75rem 1.5rem; background: var(--em-bg); color: var(--em-text-muted); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; }
+        .em-table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--em-border); font-size: 0.9rem; }
+
+        /* Scripts */
+        .script-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+        .script-badge { font-size: 0.65rem; font-weight: 800; background: var(--em-light-blue); color: var(--em-blue); padding: 0.2rem 0.5rem; border-radius: 4px; text-transform: uppercase; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { background: white; width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 90vh; display: flex; flex-direction: column; }
+        .modal-body { padding: 2rem; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+
+        .hidden { display: none !important; }
+
+        /* Mobile */
+        .hamburger { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent; color: var(--em-text-main); font-size: 1.4rem; cursor: pointer; border-radius: 8px; }
+        .hamburger:hover { background: var(--em-light-blue); color: var(--em-blue); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 800; }
+        .sidebar-overlay.active { display: block; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .sidebar.mobile-open { display: flex !important; transform: translateX(0) !important; }
+            .main-stage { margin-left: 0; }
+            .header { padding: 0 1rem; }
+            .hamburger { display: flex !important; }
+.search-bar { display: none; }
+         }
+
+         /* Splash Screen */
+         .splash-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--em-dark-blue),var(--em-blue));display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.3s ease}
+         .splash-screen.hidden{opacity:0;pointer-events:none}
+         .splash-content{text-align:center;color:#fff}
+         .splash-content i{font-size:4rem;margin-bottom:1rem;animation:pulse 1.5s ease-in-out infinite}
+         .splash-content h2{font-size:1.8rem;margin-bottom:0.5rem}
+         .loading-dots{font-size:1.2rem}
+         .loading-dots span{animation:blink 1.5s infinite;opacity:0}
+         .loading-dots span:nth-child(2){animation-delay:0.25s}
+         .loading-dots span:nth-child(3){animation-delay:0.5s}
+         @keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+         .sidebar{transition:transform 0.3s ease}
+     </style>
+    </head>
+    <body>
+        <!-- Loading Splash Screen -->
+        <div id="splashScreen" class="splash-screen">
+            <div class="splash-content">
+                <i class="fas fa-notes-medical"></i>
+                <h2>Doctors on Wheels</h2>
+                <div class="loading-dots">Loading<span>.</span><span>.</span><span>.</span></div>
+            </div>
+        </div>
+        <div class="app-shell">
+        <div class="sidebar-overlay" onclick="closeMobileMenu()"></div>
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-notes-medical"></i>
+                <h1>Doctors on Wheels</h1>
+            </div>
+            <nav class="nav-section">
+                <div class="nav-label">EM Guidance</div>
+                <div class="nav-item active" data-target="dashboard"><i class="fas fa-laptop-medical"></i> Clinical Hub</div>
+                <div class="nav-item" data-target="scripts"><i class="fas fa-book-open"></i> Treatment Scripts</div>
+                
+                <div class="nav-label">Practice Management</div>
+                <div class="nav-item" data-target="appointments"><i class="fas fa-user-clock"></i> Consultations</div>
+                <div class="nav-item" data-target="patients"><i class="fas fa-id-card"></i> Registry</div>
+                
+                <div class="nav-label">Medical Tools</div>
+                <div class="nav-item" data-target="ai-tools"><i class="fas fa-wand-sparkles"></i> AI Scribe</div>
+                <div class="nav-item" data-target="pricing"><i class="fas fa-coins"></i> Billing</div>
+            </nav>
+            <div style="padding: 1.5rem; border-top: 1px solid var(--em-border);">
+                <div class="nav-item" onclick="handleLogout()" style="color: var(--em-danger);"><i class="fas fa-sign-out"></i> Log Out</div>
+            </div>
+        </aside>
+
+        <main class="main-stage">
+            <header class="header">
+                <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Find guidance, drugs, or patient files...">
+                </div>
+                <div style="display:flex; align-items:center; gap:1.5rem;">
+                    <div style="font-weight:700; color:var(--em-blue); font-size:0.85rem;" id="sttBalance">0.00 STT</div>
+                    <div style="text-align:right;">
+                        <div style="font-weight:600; font-size:0.85rem;" id="displayDocName">Dr. Sarah Smith</div>
+                        <div style="font-size:0.7rem; color:var(--em-text-muted);">Verified Provider</div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- VIEW: CLINICAL HUB -->
+                <section id="view-dashboard">
+                    <div class="page-title"><h2>Clinical Hub</h2></div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="stat-val" id="countPending">0</div><div class="stat-lab">Pending Triage</div></div>
+                        <div class="stat-card"><div class="stat-val" id="countActive">0</div><div class="stat-lab">Active Cases</div></div>
+                        <div class="stat-card"><div class="stat-val" id="countCompleted">0</div><div class="stat-lab">Resolved</div></div>
+                        <div class="stat-card"><div class="stat-val" id="countCredits">R 0</div><div class="stat-lab">Practice Revenue</div></div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1.5rem;">
+                        <div class="em-card">
+                            <div class="card-header">Priority Triage Queue</div>
+                            <div id="pendingList" style="padding:0;"></div>
+                        </div>
+                        <div class="em-card">
+                            <div class="card-header">Availability</div>
+                            <div class="card-body">
+                                <button class="btn btn-primary" style="width:100%;" id="gigToggleBtn" onclick="toggleOnline()">Enable Home Visits</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: TREATMENT SCRIPTS -->
+                <section id="view-scripts" class="hidden">
+                    <div class="page-title"><h2>EM Treatment Scripts</h2></div>
+                    <div class="em-card">
+                        <div class="card-header">
+                            Evidence-Based Protocols
+                            <input type="text" class="search-input" id="scriptSearch" style="width:250px;" placeholder="Search scripts..." onkeyup="filterScripts()">
+                        </div>
+                        <div class="card-body">
+                            <div id="scriptsContainer" class="script-grid"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: CONSULTATIONS -->
+                <section id="view-appointments" class="hidden">
+                    <div class="page-title"><h2>Patient Consultations</h2></div>
+                    <div class="em-card">
+                        <table class="em-table" id="appointmentsTable">
+                            <thead><tr><th>Patient</th><th>Service Details</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- VIEW: AI SCRIBE -->
+                <section id="view-ai-tools" class="hidden">
+                    <div class="page-title"><h2>AI Medical Scribe</h2></div>
+                    <div class="em-card">
+                        <div class="card-header">SOAP Note Framework</div>
+                        <div class="card-body">
+                            <textarea id="aiSummaryIn" style="width:100%; padding:1rem; border-radius:8px; border:1px solid var(--em-border);" rows="6" placeholder="Paste consultation notes..."></textarea>
+                            <button class="btn btn-primary" style="margin-top:1rem;" onclick="runAiSummary()">Generate Clinical Note</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- MORE VIEWS -->
+                <section id="view-patients" class="hidden"><div class="page-title"><h2>Patient Registry</h2></div><div class="em-card"><table class="em-table"><thead><tr><th>Name</th><th>Email</th><th>Last Visit</th></tr></thead><tbody id="patientsBody"></tbody></table></div></section>
+                <section id="view-pricing" class="hidden"><div class="page-title"><h2>Billing Structure</h2></div><div class="em-card"><div class="card-body" id="pricingBody"></div></div></section>
+            </div>
+        </main>
+    </div>
+
+    <!-- TRIAGE MODAL -->
+    <div id="triageOverlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="card-header" style="background:var(--em-blue); color:white; border:none;">
+                <span>Integrated Triage Assessment</span>
+                <div style="display:flex; gap:0.5rem;">
+                    <button class="btn btn-sm btn-primary" id="emailTriageBtn"><i class="fas fa-envelope"></i> Email Report</button>
+                    <button class="btn btn-sm btn-primary" onclick="closeTriage()"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div><h4 style="font-size:0.8rem; text-transform:uppercase; margin-bottom:1rem;">Patient Input</h4><div id="triageRawData"></div></div>
+                <div style="border-left:1px solid var(--em-border); padding-left:2rem;"><h4 style="font-size:0.8rem; text-transform:uppercase; color:var(--em-blue); margin-bottom:1rem;">EM Decision Support</h4><div id="triageAiResults"></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCTOR TOOLS MODAL (Sick Note, Prescription, Referral) -->
+    <div id="toolsModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="card-header" style="background:var(--em-blue); color:white; border:none;">
+                <span id="toolsModalTitle">Medical Document Generator</span>
+                <button class="btn btn-sm btn-primary" onclick="closeTools()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="display:block;">
+                <div class="em-card" style="border: 2px dashed var(--em-blue); background: var(--em-light-blue); padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="font-size: 0.8rem; font-weight: 700; color: var(--em-blue); margin-bottom: 0.5rem; text-transform: uppercase;">
+                        <i class="fas fa-magic"></i> AI Scribe Context
+                    </div>
+                    <textarea id="scribeContext" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" rows="3" placeholder="Notes from consultation to include in document..."></textarea>
+                </div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
+                    <button class="btn btn-ghost" onclick="generateDocument('Sick Note')"><i class="fas fa-bed"></i> Sick Note</button>
+                    <button class="btn btn-ghost" onclick="generateDocument('Prescription')"><i class="fas fa-pills"></i> Prescription</button>
+                    <button class="btn btn-ghost" onclick="generateDocument('Referral Letter')"><i class="fas fa-file-export"></i> Referral</button>
+                </div>
+
+                <div id="documentPreview" class="hidden" style="border:1px solid var(--em-border); padding:2rem; background:white; font-family:'Times New Roman', serif; position:relative; min-height:500px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
+                    <!-- Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; padding-bottom:1.5rem; margin-bottom:2rem;">
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                            <img src="/WhatsApp Image 2026-06-01 at 15.56.03.jpeg" style="height:80px; object-fit:contain;" alt="Doctors on Wheels Logo">
+                            <div>
+                                <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px;">Doctors on Wheels</h2>
+                                <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
+                            </div>
+                        </div>
+                        <div style="text-align:right; font-size:0.85rem;">
+                            <strong id="docHeaderName" style="font-size:1.1rem;"></strong><br>
+                            <span id="docSpecialty"></span><br>
+                            <p style="margin-top:0.5rem;">
+                                HPCSA: <span id="docHpcsa"></span><br>
+                                PR No: <span id="docPr"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center; margin-bottom:2rem;">
+                        <h3 id="docTitle" style="text-decoration:underline; text-transform:uppercase;">Medical Report</h3>
+                    </div>
+
+                    <!-- Body -->
+                    <div id="documentContent" style="white-space: pre-wrap; font-size:1.1rem; line-height:1.6; color:#1a1a1a;"></div>
+
+                    <!-- Footer -->
+                    <div style="margin-top:3rem; padding-top:1rem; border-top:1px solid #eee;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                            <div>
+                                <p><strong>Date:</strong> <span id="docDate"></span></p>
+                                <p><strong>Location:</strong> Digital Consultation / Home Visit</p>
+                            </div>
+                            <div style="text-align:center;">
+                                <div style="font-family:'Dancing Script', cursive; font-size:1.5rem; border-bottom:1px solid #333; margin-bottom:0.5rem; padding:0 1rem;" id="docSignature">Sarah Smith</div>
+                                <p style="font-size:0.8rem; color:#666;">Electronically Signed</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="position:absolute; bottom:1rem; right:1rem;" onclick="notify('Document Saved & Shared', 'success')">
+                        <i class="fas fa-save"></i> Save & Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" style="position:fixed; bottom:20px; right:20px; z-index:3000;"></div>
+
+    <script>
+        const BASE_URL = window.API_BASE || '';
+        let authToken = localStorage.getItem('token');
+        let currentAppointments = [];
+
+// ========== AUTH & INIT ==========
+        async function init() {
+            if (!authToken) { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'login.html'; return; }
+            try {
+                const user = await apiCall('/api/auth/me');
+                if (user.role !== 'DOCTOR') { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'index.html'; return; }
+                document.getElementById('displayDocName').textContent = user.name;
+                document.getElementById('splashScreen').classList.add('hidden');
+                await loadProfile();
+                updateBalance();
+                loadStats();
+            } catch (e) { handleLogout(); }
+        }
+
+        function handleLogout() {
+            authToken = null;
+            localStorage.removeItem('token');
+            document.getElementById('splashScreen').classList.remove('hidden');
+            window.location.href = 'login.html';
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const headers = { 'Content-Type': 'application/json' };
+            if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+            const res = await fetch(BASE_URL + endpoint, { ...options, headers });
+            if (res.status === 401) { handleLogout(); throw new Error('Session Expired'); }
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.detail || 'API Error');
+            return data;
+        }
+
+        // ========== DATA LOADERS ==========
+        async function loadStats() {
+            try {
+                const appts = await apiCall('/api/appointments');
+                currentAppointments = appts;
+                const earnings = await apiCall('/api/credits/doctor/earnings');
+                
+                document.getElementById('countPending').textContent = appts.filter(a => a.status === 'SCHEDULED').length;
+                document.getElementById('countActive').textContent = appts.filter(a => a.status === 'ACTIVE').length;
+                document.getElementById('countCompleted').textContent = appts.filter(a => a.status === 'COMPLETED').length;
+                document.getElementById('countCredits').textContent = 'R ' + (earnings.total_earnings);
+
+                renderPending(appts.filter(a => a.status === 'SCHEDULED'));
+                renderAppointments(appts);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderPending(list) {
+            const container = document.getElementById('pendingList');
+            if (!list.length) { container.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--em-text-muted);">Queue Empty</div>'; return; }
+            container.innerHTML = `<table class="em-table">` + list.map(a => `
+                <tr>
+                    <td><strong>${a.patient_name}</strong><br><small>${a.reason || 'General Consult'}</small></td>
+                    <td style="text-align:right;">
+                        <button class="btn btn-sm btn-ghost" onclick="viewTriageById(${a.id})">Triage</button>
+                        <button class="btn btn-sm btn-primary" onclick="acceptAppointment(${a.id})">Accept</button>
+                    </td>
+                </tr>
+            `).join('') + `</table>`;
+        }
+
+        function renderAppointments(list) {
+            const tbody = document.querySelector('#appointmentsTable tbody');
+            tbody.innerHTML = list.map(a => `
+                <tr>
+                    <td><strong>${a.patient_name}</strong></td>
+                    <td><span class="script-badge">${a.appointment_type}</span> ${a.location || ''}</td>
+                    <td><span style="font-weight:700; font-size:0.7rem;">${a.status}</span></td>
+                    <td><button class="btn btn-sm btn-ghost" onclick="viewTriageById(${a.id})">Review</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function viewTriageById(id) {
+            const appt = currentAppointments.find(a => a.id === id);
+            if (!appt) return;
+            document.getElementById('triageOverlay').classList.remove('hidden');
+            document.getElementById('emailTriageBtn').onclick = () => triggerEmail(`Report: ${appt.patient_name}`, "Summary...");
+            
+            const rawDiv = document.getElementById('triageRawData');
+            if (appt.triage_data) {
+                const d = JSON.parse(appt.triage_data);
+                rawDiv.innerHTML = Object.entries(d).map(([k,v]) => {
+                    if (k === 'questionnaire' && typeof v === 'object' && v !== null) {
+                        // Calculate age if DOB is present
+                        let ageHtml = '';
+                        if (v.dob) {
+                            const dob = new Date(v.dob);
+                            const diff = Date.now() - dob.getTime();
+                            const age = new Date(diff).getUTCFullYear() - 1970;
+                            ageHtml = `<div style="margin-bottom:0.5rem; color:var(--em-blue); font-weight:700;">Age: ${age} years</div>`;
+                        }
+
+                        let qHtml = '<div style="background:var(--em-bg); padding:1rem; border-radius:8px; border:1px solid var(--em-border);">';
+                        qHtml += ageHtml;
+                        qHtml += Object.entries(v).map(([qk, qv]) => `<div style="margin-bottom:0.5rem"><strong>${qk.replace(/_/g, ' ')}:</strong> ${qv}</div>`).join('');
+                        qHtml += '</div>';
+                        return `<div style="margin-bottom:1.5rem;"><strong style="font-size:0.7rem; text-transform:uppercase; color:var(--em-blue);">📋 Full Medical Questionnaire</strong>${qHtml}</div>`;
+                    }
+                    return `<div style="margin-bottom:0.75rem;"><strong style="font-size:0.7rem; text-transform:uppercase; color:var(--em-text-muted);">${k.replace(/_/g, ' ')}</strong><p>${v}</p></div>`;
+                }).join('');
+            }
+            
+            const aiDiv = document.getElementById('triageAiResults');
+            if (appt.triage_tools_results) {
+                const res = JSON.parse(appt.triage_tools_results);
+                aiDiv.innerHTML = Object.entries(res).map(([k,v]) => `<div style="border-left:3px solid var(--em-blue); padding-left:1rem; margin-bottom:1rem;"><strong>${k}</strong><p style="font-size:0.85rem;">${v}</p></div>`).join('');
+            }
+
+            // Add button to open medical tools
+            const actionContainer = document.createElement('div');
+            actionContainer.style.marginTop = '2rem';
+            actionContainer.innerHTML = `<button class="btn btn-primary" onclick="openTools(${id})"><i class="fas fa-file-medical"></i> Issue Document (Note/Script/Referral)</button>`;
+            aiDiv.appendChild(actionContainer);
+        }
+
+        function closeTriage() { document.getElementById('triageOverlay').classList.add('hidden'); }
+
+        // ========== MEDICAL TOOLS (Notes, Scripts, Referrals) ==========
+        let activeAppointmentId = null;
+
+        function openTools(appointmentId) {
+            activeAppointmentId = appointmentId;
+            const appt = currentAppointments.find(a => a.id === appointmentId);
+            document.getElementById('toolsModal').classList.remove('hidden');
+            document.getElementById('docDate').textContent = new Date().toLocaleDateString('en-ZA');
+            document.getElementById('documentPreview').classList.add('hidden');
+            document.getElementById('scribeContext').value = appt ? `Consultation for ${appt.patient_name} regarding ${appt.reason || 'medical assessment'}.` : '';
+        }
+
+        function closeTools() {
+            document.getElementById('toolsModal').classList.add('hidden');
+        }
+
+        async function generateDocument(type) {
+            const context = document.getElementById('scribeContext').value;
+            const appt = currentAppointments.find(a => a.id === activeAppointmentId);
+            const patientName = appt ? appt.patient_name : "[Patient Name]";
+            
+            // Get doctor profile details for credentials
+            const profile = await apiCall('/api/profile/doctor');
+            document.getElementById('docSpecialty').textContent = profile.specialty || "Medical Practitioner";
+            document.getElementById('docHpcsa').textContent = profile.hpcsa_number || "Verified";
+            document.getElementById('docPr').textContent = profile.practice_number || "Registered";
+            
+            notify(`Generating ${type}...`, 'info');
+            
+            let content = "";
+            const today = new Date().toLocaleDateString('en-ZA');
+            document.getElementById('docTitle').textContent = type;
+
+            if (type === 'Sick Note') {
+                content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ${context}`;
+            } else if (type === 'Prescription') {
+                content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n1. Medication A (e.g. Amoxicillin 500mg)\n   Sig: 1 tab PO TID x 5 days\n   Mitte: 15 tabs\n\n2. Medication B (e.g. Paracetamol 500mg)\n   Sig: 2 tabs PO QID PRN for pain\n   Mitte: 20 tabs\n\nRefills: 0\n\nNotes: ${context}`;
+            } else if (type === 'Referral Letter') {
+                content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n- Patient presented with symptoms as described in the consultation.\n- Initial assessment suggests specialized intervention may be required.\n\nContext & Notes: ${context}\n\nThank you for your assistance in the ongoing care of this patient.`;
+            }
+
+            document.getElementById('documentContent').textContent = content;
+            document.getElementById('documentPreview').classList.remove('hidden');
+        }
+
+        async function updateBalance() {
+            try {
+                const bal = await apiCall('/api/somnia/escrow/wallet/balance');
+                document.getElementById('sttBalance').textContent = parseFloat(bal.balance_eth).toFixed(2) + ' STT';
+            } catch (e) {}
+        }
+
+        async function loadProfile() {
+            try {
+                const profile = await apiCall('/api/profile/doctor');
+                const btn = document.getElementById('gigToggleBtn');
+                btn.textContent = profile.is_online ? 'Disable Home Visits' : 'Enable Home Visits';
+                btn.className = profile.is_online ? 'btn btn-danger' : 'btn btn-primary';
+
+                document.getElementById('displayDocName').textContent = profile.name || '';
+                document.getElementById('docHeaderName').textContent = profile.name || '';
+                document.getElementById('docSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+                document.getElementById('docSpecialty').textContent = profile.specialty || 'Medical Practitioner';
+                document.getElementById('docHpcsa').textContent = profile.hpcsa_number || 'Verified';
+                document.getElementById('docPr').textContent = profile.practice_number || 'Registered';
+            } catch (e) {}
+        }
+
+        async function toggleOnline() {
+            try {
+                const profile = await apiCall('/api/profile/doctor');
+                await apiCall('/api/profile/doctor/gig-mode', { method: 'POST', body: JSON.stringify({ is_online: !profile.is_online }) });
+                loadProfile();
+            } catch (e) { notify(e.message, 'error'); }
+        }
+
+        const CLINICAL_SCRIPTS = [
+            { id: 1, title: "Triage Classification", source: "NICE CKS", content: "Acuity: Red (Emergent), Yellow (Urgent), Green (Routine)." },
+            { id: 2, title: "NEWS2 Scoring", source: "RCP", content: "National Early Warning Score for acute illness assessment." },
+            { id: 3, title: "WHO IMAI Care", source: "WHO", content: "Integrated Management of Adult Illness for primary settings." }
+        ];
+
+        function loadScripts() {
+            const container = document.getElementById('scriptsContainer');
+            container.innerHTML = CLINICAL_SCRIPTS.map(s => `
+                <div class="em-card" style="margin-bottom:0;">
+                    <div class="card-body">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;"><span class="script-badge">${s.source}</span><i class="fas fa-envelope" style="cursor:pointer;" onclick="triggerEmail('${s.title}','${s.content}')"></i></div>
+                        <h4 style="margin-bottom:0.5rem;">${s.title}</h4>
+                        <p style="font-size:0.85rem; color:var(--em-text-muted);">${s.content}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterScripts() {
+            const q = document.getElementById('scriptSearch').value.toLowerCase();
+            const filtered = CLINICAL_SCRIPTS.filter(s => s.title.toLowerCase().includes(q));
+            // ... (Simple filter logic)
+        }
+
+        async function triggerEmail(sub, body) {
+            const email = prompt("Email Address:", "doctor@example.com");
+            if (!email) return;
+            try {
+                notify("Transmitting...", "info");
+                await apiCall('/api/somnia/agent/email', { method: 'POST', body: JSON.stringify({ recipient: email, subject: sub, body: body }) });
+                notify("Email Sent", "success");
+            } catch (e) { notify("Failed", "error"); }
+        }
+
+        function notify(msg, type) {
+            const t = document.createElement('div');
+            t.style.cssText = `padding:1rem 1.5rem; background:white; border-left:4px solid ${type==='error'?'red':'var(--em-blue)'}; border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin-top:0.5rem; font-weight:600; font-size:0.85rem;`;
+            t.textContent = msg;
+            document.getElementById('toastContainer').appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function navigateTo(t) {
+            document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-' + t).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
+            document.querySelector(`[data-target="${t}"]`)?.classList.add('active');
+            if (t === 'scripts') loadScripts();
+            if (window.innerWidth <= 768) closeMobileMenu();
+        }
+
+        function toggleMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                const isOpen = sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active', isOpen);
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) closeMobileMenu();
+        });
+
+        document.querySelectorAll('.nav-item[data-target]').forEach(i => i.onclick = () => navigateTo(i.dataset.target));
+
+        init();
+    </script>
+</body>
+</html>

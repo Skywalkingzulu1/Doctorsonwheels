@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX7H7BJ8XY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZX7H7BJ8XY');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors on Wheels - Register</title>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0052cc;
+            --primary-dark: #0747a6;
+            --secondary: #00a3bf;
+            --bg: #f4f5f7;
+            --white: #ffffff;
+            --text: #172b4d;
+            --error: #de350b;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+        }
+        .register-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+        h1 { margin: 0 0 0.5rem 0; color: var(--primary); font-weight: 800; }
+        h1 span { color: var(--secondary); }
+        p { color: #6b778c; margin-bottom: 2rem; font-size: 0.95rem; }
+        
+        .form-group { text-align: left; margin-bottom: 1.5rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem; }
+        input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #dfe1e6;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        
+        .footer-links { margin-top: 1.5rem; font-size: 0.85rem; color: #6b778c; }
+        .footer-links a { color: var(--primary); text-decoration: none; font-weight: bold; }
+
+        #error-message {
+            color: var(--error);
+            background: #ffebe6;
+            padding: 0.8rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <h1>Doctors on <span>Wheels</span></h1>
+        <p>Join South Africa's Medical Network</p>
+        
+        <div id="error-message"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" required placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="john@example.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="********">
+            </div>
+            <div class="form-group">
+                <label for="role">I am a...</label>
+                <select id="role">
+                    <option value="PATIENT">Patient</option>
+                    <option value="DOCTOR">Doctor</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Create Account</button>
+        </form>
+
+        <div class="footer-links">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        const SESSION_KEY = 'dow_register_draft';
+        
+        function saveDraft() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const role = document.getElementById('role').value;
+            if (name || email) {
+                sessionStorage.setItem(SESSION_KEY, JSON.stringify({ name, email, role }));
+            }
+        }
+        
+        function restoreDraft() {
+            const raw = sessionStorage.getItem(SESSION_KEY);
+            if (!raw) return;
+            try {
+                const draft = JSON.parse(raw);
+                if (draft.name) document.getElementById('name').value = draft.name;
+                if (draft.email) document.getElementById('email').value = draft.email;
+                if (draft.role) document.getElementById('role').value = draft.role;
+            } catch (e) {}
+        }
+        
+        function clearDraft() {
+            sessionStorage.removeItem(SESSION_KEY);
+        }
+        
+        document.getElementById('registerForm').addEventListener('input', saveDraft);
+        document.getElementById('registerForm').addEventListener('change', saveDraft);
+        
+        restoreDraft();
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const errorDiv = document.getElementById('error-message');
+
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, role })
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.detail || 'Registration failed');
+                }
+
+                // Auto-login to get token
+                try {
+                    const formData = new URLSearchParams();
+                    formData.append('username', email);
+                    formData.append('password', password);
+
+                    const loginRes = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: formData
+                    });
+
+                    if (loginRes.ok) {
+                        const loginData = await loginRes.json();
+                        localStorage.setItem('token', loginData.access_token);
+                        localStorage.setItem('user', JSON.stringify(loginData.user));
+                    }
+                } catch (loginErr) {
+                    console.error('Auto-login failed:', loginErr);
+                }
+                
+                // Redirect based on role
+                clearDraft();
+                if (role === 'PATIENT') {
+                    window.location.href = 'patient_onboarding.html';
+                } else {
+                    alert('Registration successful! Please login.');
+                    window.location.href = 'login.html';
+                }
+            } catch (e) {
+                errorDiv.textContent = e.message;
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
