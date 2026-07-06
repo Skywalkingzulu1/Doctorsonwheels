@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX7H7BJ8XY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZX7H7BJ8XY');
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctors on Wheels - Patient App</title>
+    <script src="config.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--primary:#0052cc;--primary-dark:#0747a6;--secondary:#00a3bf;--accent:#36b37e;--warning:#ffab00;--danger:#de350b;--light:#f4f5f7;--white:#fff;--text:#172b4d;--text-light:#6b778c;--border:#dfe1e6}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--light);color:var(--text);line-height:1.5}
+        .app{display:flex;min-height:100vh}
+        .sidebar{width:260px;background:var(--white);border-right:1px solid var(--border);position:fixed;height:100vh;overflow-y:auto}
+        .sidebar-header{padding:1.5rem;border-bottom:1px solid var(--border)}
+        .sidebar-header h1{font-size:1.3rem;color:var(--primary);font-weight:800}
+        .sidebar-header h1 span{color:var(--secondary)}
+        .sidebar-menu{padding:1rem 0}
+        .menu-item{padding:0.8rem 1.5rem;cursor:pointer;display:flex;align-items:center;gap:0.8rem;color:var(--text-light);transition:all 0.2s}
+        .menu-item:hover,.menu-item.active{background:var(--light);color:var(--primary);border-left:3px solid var(--primary)}
+        .main{flex:1;margin-left:260px}
+        .top-bar{background:var(--white);padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+        .content{padding:2rem}
+        .page-title{font-size:1.8rem;margin-bottom:1.5rem}
+        .card{background:var(--white);border-radius:12px;padding:1.5rem;margin-bottom:1rem;border:1px solid var(--border)}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+        .card-title{font-size:1.1rem;font-weight:600}
+        .btn{padding:0.7rem 1.5rem;border:none;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.5rem}
+        .btn-primary{background:var(--primary);color:#fff}
+        .btn-primary:hover{background:var(--primary-dark)}
+        .btn-secondary{background:var(--light);color:var(--text);border:1px solid var(--border)}
+        .btn-accent{background:var(--accent);color:#fff}
+        .btn-danger{background:var(--danger);color:#fff}
+        .btn-sm{padding:0.4rem 0.8rem;font-size:0.85rem}
+        .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem}
+        .stats{grid-template-columns:repeat(4,1fr)}
+        .stat-card{background:var(--white);padding:1.5rem;border-radius:12px;border:1px solid var(--border);text-align:center}
+        .stat-value{font-size:2rem;font-weight:700;color:var(--primary)}
+        .stat-label{color:var(--text-light);font-size:0.85rem}
+        .form-group{margin-bottom:1rem}
+        .form-label{display:block;margin-bottom:0.3rem;font-weight:500;font-size:0.9rem}
+        .form-input{width:100%;padding:0.7rem;border:1px solid var(--border);border-radius:8px;font-size:0.95rem}
+        .status{padding:0.2rem 0.8rem;border-radius:20px;font-size:0.75rem;font-weight:600}
+        .status-scheduled{background:#eef2ff;color:var(--primary)}
+        .status-active{background:#e3fcef;color:var(--accent)}
+        .status-completed{background:var(--light);color:var(--text-light)}
+        .status-cancelled{background:#ffebe6;color:var(--danger)}
+        .auth-page{min-height:100vh;background:linear-gradient(135deg,var(--primary-dark),var(--primary));display:flex;align-items:center;justify-content:center;padding:2rem}
+        .auth-card{background:var(--white);padding:2.5rem;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3);width:100%;max-width:400px}
+        .auth-card h1{color:var(--primary);font-size:2rem;margin-bottom:0.5rem;text-align:center}
+        .auth-card h1 span{color:var(--secondary)}
+        .auth-card p{color:var(--text-light);margin-bottom:2rem;text-align:center}
+        .auth-card input{width:100%;padding:0.8rem;margin-bottom:1rem;border:1px solid var(--border);border-radius:8px}
+        .auth-card button{width:100%;padding:1rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer}
+        .hidden{display:none}
+        .empty{text-align:center;padding:2rem;color:var(--text-light)}
+        .table{width:100%;border-collapse:collapse}
+         .table th,.table td{padding:1rem;text-align:left;border-bottom:1px solid var(--border)}
+         .table th{background:var(--light);font-weight:600;color:var(--text-light)}
+         .online-badge{background:#36b37e;color:#fff;padding:0.2rem 0.6rem;border-radius:10px;font-size:0.7rem;font-weight:600}
+         .offline-badge{background:#6b778c;color:#fff;padding:0.2rem 0.6rem;border-radius:10px;font-size:0.7rem;font-weight:600}
+         .discount-badge{background:#ffab00;color:#fff;padding:0.2rem 0.6rem;border-radius:10px;font-size:0.7rem;font-weight:600;margin-left:0.5rem}
+         .service-tier{border:1px solid var(--border);padding:0.8rem;margin:0.3rem 0;border-radius:8px;cursor:pointer;transition:all 0.2s}
+         .service-tier:hover,.service-tier.selected{background:#eef2ff;border-color:var(--primary)}
+         .service-tier-name{font-weight:600}
+         .service-tier-desc{font-size:0.8rem;color:var(--text-light)}
+         .service-tier-price{font-weight:700;color:var(--primary);float:right}
+         .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:1.5rem}
+         .tab{padding:1rem 1.5rem;cursor:pointer;color:var(--text-light);border-bottom:2px solid transparent;transition:all 0.2s}
+         .tab:hover,.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+         .hamburger{display:none;align-items:center;justify-content:center;width:40px;height:40px;border:none;background:transparent;color:var(--text);font-size:1.4rem;cursor:pointer;border-radius:8px}
+         .hamburger:hover{background:var(--light)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:900;transition:opacity 0.3s ease;opacity:0}.sidebar-overlay.active{opacity:1;display:block}
+          .sidebar{transition:transform 0.3s ease}
+
+          /* Splash Screen */
+          .splash-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-dark),var(--primary));display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.3s ease}
+          .splash-screen.hidden{opacity:0;pointer-events:none}
+          .splash-content{text-align:center;color:#fff}
+          .splash-content i{font-size:4rem;margin-bottom:1rem;animation:pulse 1.5s ease-in-out infinite}
+          .splash-content h2{font-size:1.8rem;margin-bottom:0.5rem}
+          .loading-dots{font-size:1.2rem}
+          .loading-dots span{animation:blink 1.5s infinite;opacity:0}
+          .loading-dots span:nth-child(2){animation-delay:0.25s}
+          .loading-dots span:nth-child(3){animation-delay:0.5s}
+          @keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+          @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+          @media(max-width:768px){
+              .sidebar{display:none;transform:translateX(-100%)}
+              .sidebar.mobile-open{display:flex !important;transform:translateX(0) !important}
+              .main{margin-left:0}
+              .stats{grid-template-columns:repeat(2,1fr)}
+              .grid-2{grid-template-columns:1fr}
+              .hamburger{display:flex !important}
+          }
+      </style>
+    </head>
+    <body>
+        <!-- Loading Splash Screen -->
+        <div id="splashScreen" class="splash-screen">
+            <div class="splash-content">
+                <i class="fas fa-heartbeat"></i>
+                <h2>Doctors on Wheels</h2>
+                <div class="loading-dots">Loading<span>.</span><span>.</span><span>.</span></div>
+            </div>
+        </div>
+        <div id="authPage" class="auth-page">
+        <div class="auth-card">
+            <h1>Doctors on <span>Wheels</span></h1>
+            <p>Login to your account</p>
+            <div id="authError" style="color:var(--danger);background:#ffebe6;padding:0.8rem;border-radius:8px;margin-bottom:1rem;display:none"></div>
+            <form id="authForm">
+                <input type="email" id="authEmail" placeholder="Email Address" required autocomplete="email">
+                <input type="password" id="authPassword" placeholder="Password" required autocomplete="current-password">
+                <button type="submit">Login</button>
+            </form>
+            <div style="margin-top:1.5rem; text-align:center; font-size:0.9rem; color:var(--text-light)">
+                Don't have an account? <a href="register.html" style="color:var(--primary); font-weight:600; text-decoration:none">Register Now</a>
+            </div>
+            <div style="margin-top:1rem;padding:1rem;background:var(--light);border-radius:8px;font-size:0.85rem;display:none">
+                <strong>Demo:</strong> test3@test.com / pass
+            </div>
+        </div>
+    </div>
+
+    <div id="appPage" class="app hidden">
+        <div class="sidebar-overlay" onclick="closeMobileMenu()"></div>
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>Doctors on <span>Wheels</span></h1>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" data-page="dashboard"><i class="fas fa-home"></i> Dashboard</div>
+                <div class="menu-item" data-page="doctors"><i class="fas fa-user-md"></i> Find Doctors</div>
+                <div class="menu-item" data-page="appointments"><i class="fas fa-calendar"></i> Appointments <span class="menu-badge" id="apptBadge">0</span></div>
+                <div class="menu-item" data-page="credits"><i class="fas fa-coins"></i> Balance</div>
+                <div class="menu-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="top-bar">
+                <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
+                <div id="pageTitle" style="font-weight:600">Dashboard</div>
+                <div class="user-info">
+                    <span id="userName">User</span>
+                    <span class="wallet" id="userCredits" style="margin-left:1rem;color:var(--accent)">R0.00</span>
+                </div>
+            </div>
+
+            <div class="content">
+                <div id="page-dashboard">
+                    <div id="discountBanner" class="card" style="background:linear-gradient(135deg,#ffab00,#ff6b00);color:#fff;display:none">
+                        <div style="display:flex;justify-content:space-between;align-items:center">
+                            <div>
+                                <strong><i class="fas fa-gift"></i> You have a discount!</strong>
+                                <div id="discountText" style="font-size:0.9rem">10% off your next booking</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stats grid" style="margin-bottom:2rem">
+                        <div class="stat-card"><div class="stat-value" id="statAppointments">0</div><div class="stat-label">Appointments</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statCredits">R0.00</div><div class="stat-label">Balance</div></div>
+                        <div class="stat-card"><div class="stat-value" id="statDoctors">0</div><div class="stat-label">Doctors</div></div>
+                    </div>
+                </div>
+
+                <div id="page-doctors" class="hidden">
+                    <h2 class="page-title">Find a Doctor</h2>
+                    <div style="margin-bottom:1rem">
+                        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+                            <input type="checkbox" id="onlineOnly" onchange="loadDoctors()">
+                            <span>Show only online doctors</span>
+                        </label>
+                    </div>
+                    <div class="search-bar">
+                        <input type="text" id="docSearch" placeholder="Search by name or specialty..." class="form-input">
+                    </div>
+                    <div id="doctorsGrid" class="grid"></div>
+                </div>
+
+                <div id="page-appointments" class="hidden">
+                    <h2 class="page-title">My Appointments</h2>
+                    <div class="tabs">
+                        <div class="tab active" onclick="filterAppts('all', this)">All</div>
+                        <div class="tab" onclick="filterAppts('SCHEDULED', this)">Scheduled</div>
+                        <div class="tab" onclick="filterAppts('ACTIVE', this)">Active</div>
+                        <div class="tab" onclick="filterAppts('COMPLETED', this)">Completed</div>
+                    </div>
+                    <table class="table">
+                        <thead><tr><th>Doctor</th><th>Service</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="appointmentsTable"></tbody>
+                    </table>
+                </div>
+
+                <div id="page-credits" class="hidden">
+                    <h2 class="page-title">My Balance</h2>
+                    <div class="card" style="text-align:center;padding:3rem">
+                        <div style="font-size:4rem;color:var(--primary);font-weight:700" id="creditsBalance">R0.00</div>
+                        <div style="color:var(--text-light);margin-top:0.5rem">Available Balance (Rands)</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Add Funds (Rands)</div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem">
+                            <button class="btn btn-secondary" onclick="buyCredits(100)">R100</button>
+                            <button class="btn btn-secondary" onclick="buyCredits(250)">R250</button>
+                            <button class="btn btn-primary" onclick="buyCredits(500)">R500</button>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top:1rem">
+                        <div class="card-title">Transaction History</div>
+                        <div id="transactionHistory" class="empty">No transactions yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="auth-page" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000">
+        <div class="auth-card" style="max-width:500px;max-height:90vh;overflow-y:auto">
+            <h2>Book Appointment</h2>
+            <div id="bookingDoctorInfo"></div>
+            <div id="serviceTiers"></div>
+            <div class="form-group" style="margin-top:1.5rem">
+                <label class="form-label">Date & Time</label>
+                <input type="datetime-local" id="bookingDateTime" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Visit Type</label>
+                <select id="bookingType" class="form-select" onchange="toggleLocationField()">
+                    <option value="VIDEO">Video Call</option>
+                    <option value="INPERSON">Home Visit (Doctor comes to you)</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="locationGroup">
+                <label class="form-label">Your Address for Home Visit</label>
+                <input type="text" id="bookingLocation" class="form-input" placeholder="Enter full physical address">
+            </div>
+            <div class="form-group hidden" id="distanceGroup">
+                <label class="form-label">Distance (km)</label>
+                <input type="number" id="bookingDistance" class="form-input" min="0" value="0" placeholder="Distance in km..." oninput="updatePriceDisplay()">
+            </div>
+
+            <div id="discountDisplay" style="color:var(--warning);margin:1rem 0;display:none">
+                <i class="fas fa-tag"></i> Discount applied: R<span id="discountAmount">0</span> off
+            </div>
+            <div style="margin:1rem 0;padding:1rem;background:var(--light);border-radius:8px">
+                <div style="display:flex;justify-content:space-between"><span>Base Price:</span><span>R<span id="basePrice">0</span></span></div>
+                <div id="discountLine" style="display:none;color:var(--warning)"><span>Discount:</span><span>R<span id="discountValue">0</span></span></div>
+                <div id="calloutFeeLine" style="display:none;color:var(--text-light)"><span>Callout Fee:</span><span>R<span id="calloutFeePrice">0</span></span></div>
+                <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem"><span>Total:</span><span>R<span id="totalPrice">0</span></span></div>
+                <div style="display:flex;flex-direction:column;gap:0.8rem;padding-top:0.8rem;margin-top:0.8rem;border-top:1px solid var(--border)">
+                    <label style="font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:8px;cursor:pointer">
+                        <input type="radio" name="payMethod" id="payWithCredits" checked style="width:18px;height:18px"> Pay with Rands (Wallet Balance)
+                    </label>
+                    <label style="font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:8px;cursor:pointer">
+                        <input type="radio" name="payMethod" id="payWithYoco" style="width:18px;height:18px"> Pay with Yoco (Credit/Debit Card)
+                    </label>
+                </div>
+            </div>
+            
+            <div style="border-top:1px solid var(--border); margin-top:1.5rem; padding-top:1.5rem;">
+                <h3 style="margin-bottom:1rem;">Rich Triage Questionnaire</h3>
+                <div class="form-group">
+                    <label class="form-label">Chief Complaint (Main Reason)</label>
+                    <textarea id="triageReason" class="form-textarea" rows="2" placeholder="e.g. Severe headache, high fever"></textarea>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Duration of Symptoms</label>
+                        <input type="text" id="triageDuration" class="form-input" placeholder="e.g. 3 days">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Pain Scale (0-10)</label>
+                        <input type="number" id="triagePain" class="form-input" min="0" max="10">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Current Medications</label>
+                    <input type="text" id="triageMeds" class="form-input" placeholder="List medications you are taking">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Known Allergies</label>
+                    <input type="text" id="triageAllergies" class="form-input" placeholder="List any allergies">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Pre-existing Conditions</label>
+                    <input type="text" id="triageConditions" class="form-input" placeholder="e.g. Diabetes, Asthma">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Any 'Red Flags'? (e.g. Chest pain, difficulty breathing)</label>
+                    <input type="text" id="triageFlags" class="form-input" placeholder="Describe any urgent symptoms">
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%" onclick="confirmBooking()">Confirm Booking</button>
+            <button class="btn btn-secondary" style="width:100%;margin-top:0.5rem" onclick="closeBookingModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="tipModal" class="auth-page" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000">
+        <div class="auth-card" style="max-width:400px">
+            <h2>Rate Your Experience</h2>
+            <p style="color:var(--text-light);margin-bottom:1rem">How was your consultation?</p>
+            <div style="display:flex;gap:1rem;justify-content:center;margin-bottom:1rem">
+                <button class="btn btn-sm btn-secondary" onclick="reportIssue()"><i class="fas fa-exclamation-triangle"></i> Report Issue</button>
+            </div>
+            <hr style="margin:1rem 0">
+            <p style="margin-bottom:0.5rem">Add a tip for your doctor (optional)</p>
+            <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:1rem">100% of your tip goes to the doctor</p>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem">
+                <button class="btn btn-sm btn-secondary" onclick="selectTip(10)">+10</button>
+                <button class="btn btn-sm btn-secondary" onclick="selectTip(25)">+25</button>
+                <button class="btn btn-sm btn-secondary" onclick="selectTip(50)">+50</button>
+                <button class="btn btn-sm btn-secondary" onclick="selectTip(100)">+100</button>
+            </div>
+            <div id="selectedTip" style="margin:1rem 0;text-align:center;font-weight:600;color:var(--accent)"></div>
+            <button class="btn btn-primary" style="width:100%" onclick="submitTip()">Done</button>
+            <button class="btn btn-secondary" style="width:100%;margin-top:0.5rem" onclick="skipTip()">Skip</button>
+        </div>
+    </div>
+
+    <script>
+    const API_BASE = window.API_BASE || 'https://doctorlink-knmy.onrender.com';
+    let authToken = localStorage.getItem('token');
+    let currentUser = null;
+    let selectedDoctor = null;
+    let selectedTier = null;
+    let selectedTipAmount = 0;
+    let currentAppointmentForTip = null;
+
+    const serviceTiers = [
+        { id: 'QUICK_CHAT', name: 'Nurse Consultation', desc: '30 minutes - Consultation with a Registered Nurse', base: 450 },
+        { id: 'VIDEO_CALL', name: 'Doctor Video Call', desc: '30 minutes - Standard consultation with Doctor', base: 800 },
+        { id: 'FULL_CONSULTATION', name: 'Doctor Full Consultation', desc: '60 minutes - Extended session with Doctor', base: 800 },
+        { id: 'PRESCRIPTION_REVIEW', name: 'Prescription Review', desc: 'Report analysis', base: 80 },
+        { id: 'REPORT_ANALYSIS', name: 'Report Analysis', desc: 'Medical report review', base: 120 }
+    ];
+
+    async function apiCall(endpoint, options = {}) {
+        const url = API_BASE + endpoint;
+        const headers = { 'Content-Type': 'application/json' };
+        if (authToken) {
+            headers['Authorization'] = 'Bearer ' + authToken;
+        }
+        const response = await fetch(url, { ...options, headers });
+        const text = await response.text();
+        if (!response.ok) {
+            let detail = 'API Error';
+            try { detail = JSON.parse(text).detail || detail; } catch(e) {}
+            throw new Error(detail);
+        }
+        return JSON.parse(text);
+    }
+
+    document.getElementById('authForm').onsubmit = async e => {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPassword').value;
+        const err = document.getElementById('authError');
+        err.style.display = 'none';
+        try {
+            const params = new URLSearchParams();
+            params.append('username', email);
+            params.append('password', password);
+            const response = await fetch(API_BASE + '/api/auth/login', { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params 
+            });
+            if (!response.ok) throw new Error('Login failed');
+            const data = await response.json();
+            authToken = data.access_token;
+            currentUser = data.user;
+            localStorage.setItem('token', authToken);
+            showApp();
+        } catch (e) {
+            err.textContent = e.message;
+            err.style.display = 'block';
+        }
+    };
+
+    function showApp() {
+        document.getElementById('splashScreen').classList.add('hidden');
+        document.getElementById('authPage').classList.add('hidden');
+        document.getElementById('appPage').classList.remove('hidden');
+        document.getElementById('userName').textContent = currentUser.name;
+        updateCreditsDisplay();
+        checkDiscount();
+        loadDashboard();
+        loadDoctors();
+    }
+
+    function updateCreditsDisplay() {
+        document.getElementById('userCredits').textContent = 'R' + Number(currentUser.credits).toFixed(2);
+    }
+
+    function checkDiscount() {
+        if (currentUser.inconvenience_discount_active) {
+            document.getElementById('discountBanner').style.display = 'block';
+            document.getElementById('discountText').textContent = 'R' + Number(currentUser.inconvenience_discount_amount).toFixed(2) + ' off your next booking';
+        } else {
+            document.getElementById('discountBanner').style.display = 'none';
+        }
+    }
+
+    document.querySelectorAll('.menu-item[data-page]').forEach(item => {
+        item.onclick = () => {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            item.classList.add('active');
+            document.querySelectorAll('[id^="page-"]').forEach(p => p.classList.add('hidden'));
+            const page = item.dataset.page;
+            document.getElementById('page-' + page).classList.remove('hidden');
+            document.getElementById('pageTitle').textContent = page.charAt(0).toUpperCase() + page.slice(1);
+            if (window.innerWidth <= 768) closeMobileMenu();
+            if (page === 'appointments') loadAppointments();
+            if (page === 'credits') loadCreditsPage();
+        }
+    });
+
+    function toggleMobileMenu() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar && overlay) {
+            const isOpen = sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active', isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        }
+    }
+
+    function closeMobileMenu() {
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.querySelector('.sidebar-overlay');
+        if (sidebar && overlay) {
+            sidebar.classList.remove('mobile-open');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) closeMobileMenu();
+    });
+
+    // Auto-init on load
+    async function autoInit() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentSuccess = urlParams.get('payment') === 'success';
+        const apptId = urlParams.get('appt');
+
+        if (paymentSuccess && apptId) {
+            window.location.href = `patient_questionnaire.html?appointment_id=${apptId}&return=index.html`;
+            return;
+        }
+
+        if (authToken) {
+            try {
+                currentUser = await apiCall('/api/auth/me');
+                showApp();
+            } catch (e) {
+                localStorage.removeItem('token');
+                document.getElementById('splashScreen').classList.add('hidden');
+            }
+        } else {
+            document.getElementById('splashScreen').classList.add('hidden');
+        }
+    }
+    
+    autoInit();
+
+    async function loadDashboard() {
+        const [appts, doctors] = await Promise.all([apiCall('/api/appointments'), apiCall('/api/doctors')]);
+        document.getElementById('statAppointments').textContent = appts.length;
+        document.getElementById('statCredits').textContent = 'R' + Number(currentUser.credits).toFixed(2);
+        document.getElementById('statDoctors').textContent = doctors.length;
+    }
+
+    async function loadDoctors() {
+        const onlineOnly = document.getElementById('onlineOnly').checked;
+        const url = onlineOnly ? '/api/doctors?online_only=true' : '/api/doctors';
+        const doctors = await apiCall(url);
+        const grid = document.getElementById('doctorsGrid');
+        if (!doctors.length) { grid.innerHTML = '<div class="empty">No doctors found</div>'; return; }
+        
+        grid.innerHTML = doctors.map(d => {
+            let badge = '';
+            if (d.name === 'Dr. Sam' || d.name === 'Sam' || d.verification_status === 'verified') {
+                badge = '<span class="online-badge" style="background:#36b37e">★ Verified</span>';
+            } else {
+                badge = '<span class="offline-badge" style="background:#6b778c;color:#fff"><i class="fas fa-clock"></i> Pending</span>';
+            }
+            
+            const isOnline = d.is_online !== false;
+            const statusBadge = isOnline ? '<span class="online-badge"><i class="fas fa-circle" style="font-size:0.5rem"></i> Online</span>' : '<span class="offline-badge">Offline</span>';
+            
+            const minPrice = Math.min(
+                d.quick_chat_price || 50,
+                d.video_call_price || 800,
+                d.full_consultation_price || 250,
+                d.prescription_review_price || 80,
+                d.report_analysis_price || 120
+            );
+            
+            return '<div class="card">' +
+                '<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.5rem">' +
+                '<div style="text-align:center;padding:1rem"><i class="fas fa-user-md" style="font-size:3rem;color:var(--text-light)"></i></div>' +
+                '<div>' + badge + ' ' + statusBadge + '</div></div>' +
+                '<h3>' + d.name + '</h3>' +
+                '<div><i class="fas fa-stethoscope"></i> ' + d.specialty + '</div>' +
+                '<div><i class="fas fa-map-marker-alt"></i> ' + d.area + '</div>' +
+                '<div style="margin-top:0.5rem;color:var(--primary);font-weight:600">From R' + minPrice + '</div>' +
+                '<button class="btn btn-primary" style="width:100%;margin-top:1rem" onclick="openBooking(' + d.id + ')">Book Now</button></div>';
+        }).join('');
+    }
+
+    function openQuestionnaire() {
+        // Save current selection to sessionStorage so we can restore it after redirect
+        sessionStorage.setItem('pending_booking_doctor_id', selectedDoctor.id);
+        sessionStorage.setItem('pending_booking_tier_id', selectedTier.id);
+
+        window.location.href = 'patient_questionnaire.html?return=' + encodeURIComponent(window.location.href);
+    }
+
+    async function openBooking(doctorId) {
+        try {
+            selectedDoctor = await apiCall('/api/doctors/' + doctorId);
+
+            // Restore tier if we're returning from questionnaire
+            const savedTierId = sessionStorage.getItem('pending_booking_tier_id');
+            selectedTier = savedTierId ? serviceTiers.find(t => t.id === savedTierId) : serviceTiers[1];
+
+            const docInfo = document.getElementById('bookingDoctorInfo');
+            if (docInfo) {
+                docInfo.innerHTML = '<div class="card"><h3>' + selectedDoctor.name + '</h3><div>' + selectedDoctor.specialty + ' - ' + selectedDoctor.area + '</div></div>';
+            }
+
+            updateServiceTiers();
+            
+            const modal = document.getElementById('bookingModal');
+            if (modal) modal.style.display = 'block';
+
+            // Set default datetime to now + 1 hour
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            const dtInput = document.getElementById('bookingDateTime');
+            if (dtInput) dtInput.value = now.toISOString().slice(0, 16);
+        } catch(e) {
+            alert('Error loading doctor: ' + e.message);
+        }
+    }
+
+    function updateServiceTiers() {
+        const container = document.getElementById('serviceTiers');
+        const multiplier = selectedDoctor.peak_pricing_multiplier || 1.0;
+        
+        const isNurse = (selectedDoctor.specialty && selectedDoctor.specialty.toLowerCase().includes('nurse')) || 
+                        (selectedDoctor.name && selectedDoctor.name.toLowerCase().includes('nurse'));
+        const docBasePrice = isNurse ? 450 : 800;
+
+        container.innerHTML = serviceTiers.map(tier => {
+            let baseVal = tier.base;
+            if (tier.id === 'VIDEO_CALL' || tier.id === 'FULL_CONSULTATION') {
+                baseVal = docBasePrice;
+            }
+            const price = Math.round(baseVal * multiplier);
+            const selected = selectedTier && selectedTier.id === tier.id ? 'selected' : '';
+            return '<div class="service-tier ' + selected + '" onclick="selectTier(\'' + tier.id + '\')">' +
+                '<span class="service-tier-name">' + tier.name + '</span>' +
+                '<span class="service-tier-price">R' + price + '</span>' +
+                '<div class="service-tier-desc">' + tier.desc + '</div></div>';
+        }).join('');
+        
+        updatePriceDisplay();
+    }
+
+    function selectTier(tierId) {
+        selectedTier = serviceTiers.find(t => t.id === tierId);
+        updateServiceTiers();
+    }
+
+    function updatePriceDisplay() {
+        const multiplier = selectedDoctor.peak_pricing_multiplier || 1.0;
+        
+        const isNurse = (selectedDoctor.specialty && selectedDoctor.specialty.toLowerCase().includes('nurse')) || 
+                        (selectedDoctor.name && selectedDoctor.name.toLowerCase().includes('nurse'));
+        const docBasePrice = isNurse ? 450 : 800;
+
+        let baseVal = selectedTier.base;
+        if (selectedTier.id === 'VIDEO_CALL' || selectedTier.id === 'FULL_CONSULTATION') {
+            baseVal = docBasePrice;
+        }
+
+        let price = Math.round(baseVal * multiplier);
+        
+        // Calculate Callout Fee
+        const type = document.getElementById('bookingType').value;
+        const distance = type === 'INPERSON' ? (Number(document.getElementById('bookingDistance').value) || 0) : 0;
+        const calloutFee = distance * 30;
+        
+        document.getElementById('basePrice').textContent = price;
+        
+        // Show/hide callout fee
+        const calloutLine = document.getElementById('calloutFeeLine');
+        if (calloutFee > 0) {
+            calloutLine.style.display = 'flex';
+            document.getElementById('calloutFeePrice').textContent = calloutFee;
+        } else {
+            calloutLine.style.display = 'none';
+        }
+        
+        // Handle discount
+        let discount = 0;
+        if (currentUser.inconvenience_discount_active) {
+            discount = Math.min(currentUser.inconvenience_discount_amount, price + calloutFee);
+            document.getElementById('discountLine').style.display = 'flex';
+            document.getElementById('discountValue').textContent = '-' + discount;
+            document.getElementById('discountDisplay').style.display = 'block';
+            document.getElementById('discountAmount').textContent = discount;
+        } else {
+            document.getElementById('discountLine').style.display = 'none';
+            document.getElementById('discountDisplay').style.display = 'none';
+        }
+        
+        const totalPrice = price + calloutFee - discount;
+        document.getElementById('totalPrice').textContent = totalPrice;
+    }
+
+    function toggleLocationField() {
+        const type = document.getElementById('bookingType').value;
+        const locGroup = document.getElementById('locationGroup');
+        const distGroup = document.getElementById('distanceGroup');
+        
+        if (type === 'INPERSON') {
+            locGroup.classList.remove('hidden');
+            distGroup.classList.remove('hidden');
+        } else {
+            locGroup.classList.add('hidden');
+            distGroup.classList.add('hidden');
+            document.getElementById('bookingDistance').value = 0;
+        }
+        updatePriceDisplay();
+    }
+
+    async function confirmBooking() {
+        const datetime = document.getElementById('bookingDateTime').value;
+        const reasonEl = document.getElementById('bookingReason');
+        const reason = reasonEl ? reasonEl.value : document.getElementById('triageReason').value;
+        const type = document.getElementById('bookingType').value;
+        const location = document.getElementById('bookingLocation').value;
+        
+        const payMethod = document.querySelector('input[name="payMethod"]:checked')?.id;
+        
+        // Collect Rich Triage Data
+        const triageData = {
+            chief_complaint: document.getElementById('triageReason').value,
+            duration: document.getElementById('triageDuration').value,
+            pain_scale: document.getElementById('triagePain').value,
+            medications: document.getElementById('triageMeds').value,
+            allergies: document.getElementById('triageAllergies').value,
+            pre_existing_conditions: document.getElementById('triageConditions').value,
+            red_flags: document.getElementById('triageFlags').value,
+            timestamp: new Date().toISOString()
+        };
+
+        if (!datetime) { alert('Please select a date and time'); return; }
+        if (type === 'INPERSON' && !location) { alert('Please enter your address for the home visit'); return; }
+        if (!authToken) { alert('Please login first'); return; }
+        
+        const confirmBtn = document.querySelector('#bookingModal .btn-primary');
+        if (confirmBtn) {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Processing...';
+        }
+        
+        try {
+            const distance = type === 'INPERSON' ? (Number(document.getElementById('bookingDistance').value) || 0) : 0;
+            const appointment = await apiCall('/api/appointments', {
+                method: 'POST',
+                body: JSON.stringify({
+                    doctor_id: selectedDoctor.id,
+                    timestamp: new Date(datetime).toISOString(),
+                    appointment_type: type,
+                    service_tier: selectedTier.id,
+                    reason: reason || triageData.chief_complaint,
+                    location: type === 'INPERSON' ? location : null,
+                    distance_km: distance,
+                    payment_method: payMethod === 'payWithYoco' ? 'yoco' : 'credits',
+                    triage_data: JSON.stringify(triageData)
+                })
+            });
+            
+            if (payMethod === 'payWithYoco') {
+                const multiplier = selectedDoctor.peak_pricing_multiplier || 1.0;
+                const isNurse = (selectedDoctor.specialty && selectedDoctor.specialty.toLowerCase().includes('nurse')) || 
+                                (selectedDoctor.name && selectedDoctor.name.toLowerCase().includes('nurse'));
+                const baseVal = (selectedTier.id === 'VIDEO_CALL' || selectedTier.id === 'FULL_CONSULTATION') ? (isNurse ? 450 : 800) : selectedTier.base;
+                const basePrice = Math.round(baseVal * multiplier);
+                const calloutFee = distance * 30;
+                
+                let discount = 0;
+                if (currentUser.inconvenience_discount_active) {
+                    discount = Math.min(currentUser.inconvenience_discount_amount, basePrice + calloutFee);
+                }
+                const totalCost = basePrice + calloutFee - discount;
+
+                // Initiate Yoco payment redirect
+                const yoco = await apiCall('/api/yoco/initiate', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        appointment_id: appointment.id,
+                        amount_zar: totalCost
+                    })
+                });
+
+                if (yoco.checkout_url) {
+                    window.location.href = yoco.checkout_url;
+                    return;
+                }
+            }
+
+            alert('Appointment created! Please provide some more information for your doctor.');
+            window.location.href = `patient_questionnaire.html?appointment_id=${appointment.id}&return=index.html`;
+        } catch (e) {
+            alert('Error booking: ' + e.message);
+            console.error('Booking error:', e);
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Confirm Booking';
+            }
+        }
+    }
+
+    function closeBookingModal() {
+        document.getElementById('bookingModal').style.display = 'none';
+    }
+
+    async function loadAppointments() {
+        const appts = await apiCall('/api/appointments');
+        const tbody = document.getElementById('appointmentsTable');
+        if (!appts.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No appointments</td></tr>'; return; }
+        
+        tbody.innerHTML = appts.map(a => {
+            let btn = '';
+            if (a.status === 'ACTIVE') btn = '<button class="btn btn-sm btn-accent" onclick="window.location.href=\'room.html?appointment_id=' + a.id + '\'">Join Call</button>';
+            else if (a.status === 'SCHEDULED') btn = '<button class="btn btn-sm btn-secondary" onclick="joinWaitingRoom(' + a.id + ')">Wait</button>';
+            else if (a.status === 'COMPLETED') btn = '<button class="btn btn-sm btn-secondary" onclick="showTipModal(' + a.id + ')">Rate & Tip</button>';
+            
+            return '<tr><td>' + (a.doctor_name || 'Doctor') + '</td><td>' + (a.service_tier || a.appointment_type) + '</td><td>' + new Date(a.timestamp).toLocaleDateString() + '</td><td><span class="status status-' + a.status.toLowerCase() + '">' + a.status + '</span></td><td>' + btn + '</td></tr>';
+        }).join('');
+    }
+
+    async function joinWaitingRoom(id) {
+        try {
+            const result = await apiCall('/api/waiting-room/join/' + id, { method: 'POST' });
+            if (result.waiting) alert('Position: ' + result.position);
+            else alert(result.message);
+            loadAppointments();
+        } catch (e) { alert('Error: ' + e.message); }
+    }
+
+    function showTipModal(appointmentId) {
+        currentAppointmentForTip = appointmentId;
+        selectedTipAmount = 0;
+        document.getElementById('selectedTip').textContent = '';
+        document.getElementById('tipModal').style.display = 'block';
+    }
+
+    function selectTip(amount) {
+        selectedTipAmount = amount;
+        document.getElementById('selectedTip').textContent = 'Tip: ' + amount + ' credits';
+    }
+
+    async function submitTip() {
+        if (selectedTipAmount > 0) {
+            try {
+                await apiCall('/api/tips', {
+                    method: 'POST',
+                    body: JSON.stringify({ appointment_id: currentAppointmentForTip, amount: selectedTipAmount })
+                });
+            } catch (e) { console.log('Tip error:', e.message); }
+        }
+        document.getElementById('tipModal').style.display = 'none';
+        
+        currentUser = await apiCall('/api/auth/me');
+        updateCreditsDisplay();
+        loadAppointments();
+    }
+
+    function skipTip() {
+        document.getElementById('tipModal').style.display = 'none';
+        loadAppointments();
+    }
+
+    async function reportIssue() {
+        if (!currentAppointmentForTip) return;
+        try {
+            const result = await apiCall('/api/appointments/' + currentAppointmentForTip + '/report-issue', { method: 'POST' });
+            alert(result.message);
+        } catch (e) { alert('Error: ' + e.message); }
+    }
+
+    async function loadCreditsPage() {
+        document.getElementById('creditsBalance').textContent = 'R' + Number(currentUser.credits).toFixed(2);
+        try {
+            const txns = await apiCall('/api/credits/transactions');
+            const container = document.getElementById('transactionHistory');
+            if (!txns.length) { container.innerHTML = '<div class="empty">No transactions yet</div>'; return; }
+            container.innerHTML = txns.map(t => '<div style="padding:0.5rem;border-bottom:1px solid var(--border)"><div>' + t.description + '</div><div style="font-size:0.8rem;color:var(--text-light)">' + new Date(t.created_at).toLocaleString() + '</div></div>').join('');
+        } catch (e) { document.getElementById('transactionHistory').innerHTML = '<div class="empty">Could not load transactions</div>'; }
+    }
+
+    async function buyCredits(amount) {
+        currentUser.credits += amount;
+        await apiCall('/api/credits/purchase', {
+            method: 'POST',
+            body: JSON.stringify({ amount: amount, payment_method: 'manual' })
+        });
+        currentUser = await apiCall('/api/auth/me');
+        updateCreditsDisplay();
+        loadCreditsPage();
+        alert('Added R' + amount + ' to your balance!');
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        document.getElementById('splashScreen').classList.remove('hidden');
+        location.reload();
+    }
+    </script>
+</body>
+</html>

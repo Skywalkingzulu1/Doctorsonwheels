@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Doctors on Wheels</title>
+    <script src="config.js"></script>
+    <style>
+        :root {
+            --primary: #0052cc;
+            --primary-dark: #0747a6;
+            --secondary: #00a3bf;
+            --light: #f4f5f7;
+            --white: #fff;
+            --text: #172b4d;
+            --border: #dfe1e6;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        .auth-card { background: white; padding: 2.5rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 400px; text-align: center; }
+        h1 { color: var(--primary); margin-bottom: 0.5rem; }
+        h1 span { color: var(--secondary); }
+        p { color: #6b778c; margin-bottom: 2rem; }
+        input { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
+        button { width: 100%; padding: 1rem; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: var(--primary-dark); }
+        .error { background: #ffebe6; color: #de350b; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; display: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <h1>Doctors on <span>Wheels</span></h1>
+        <p>Login to your account</p>
+        <div id="error" class="error"></div>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email Address" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Sign In</button>
+        </form>
+        <div style="margin-top:2rem; font-size:0.8rem; color: #6b778c; border-top: 1px solid var(--border); padding-top: 1rem;">
+            Demo Doctor: sam@docmail.com / test123<br>
+            Demo Patient: test3@test.com / pass
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = window.API_BASE || '';
+        console.log('Connecting to API at:', BASE_URL);
+        
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'none';
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', document.getElementById('email').value);
+                formData.append('password', document.getElementById('password').value);
+                
+                const res = await fetch(BASE_URL + '/api/auth/login', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Login failed');
+                
+                localStorage.setItem('token', data.access_token);
+                
+                // Check role for redirect
+                const userRes = await fetch(BASE_URL + '/api/auth/me', {
+                    headers: { 'Authorization': 'Bearer ' + data.access_token }
+                });
+                const user = await userRes.json();
+                
+                if (user.role === 'DOCTOR') {
+                    window.location.href = 'doctor_dashboard.html';
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                errorDiv.textContent = err.message;
+                errorDiv.style.display = 'block';
+            }
+        };
+    </script>
+</body>
+</html>
