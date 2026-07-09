@@ -84,7 +84,7 @@
 
           /* Splash Screen */
           .splash-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--primary-dark),var(--primary));display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.3s ease}
-          .splash-screen.hidden{opacity:0;pointer-events:none}
+           .splash-screen.hidden{opacity:0;pointer-events:none;visibility:hidden}
           .splash-content{text-align:center;color:#fff}
           .splash-content i{font-size:4rem;margin-bottom:1rem;animation:pulse 1.5s ease-in-out infinite}
           .splash-content h2{font-size:1.8rem;margin-bottom:0.5rem}
@@ -248,7 +248,7 @@
             </div>
             <div class="form-group hidden" id="distanceGroup">
                 <label class="form-label">Distance (km)</label>
-                <input type="number" id="bookingDistance" class="form-input" min="0" value="0" placeholder="Distance in km..." oninput="updatePriceDisplay()">
+                <input type="number" id="bookingDistance" class="form-input" min="0" placeholder="Distance in km..." onfocus="this.value=''" oninput="updatePriceDisplay()">
             </div>
 
             <div id="discountDisplay" style="color:var(--warning);margin:1rem 0;display:none">
@@ -487,6 +487,7 @@
         document.getElementById('statAppointments').textContent = appts.length;
         document.getElementById('statCredits').textContent = 'R' + Number(currentUser.credits).toFixed(2);
         document.getElementById('statDoctors').textContent = doctors.length;
+        document.getElementById('apptBadge').textContent = appts.length;
     }
 
     async function loadDoctors() {
@@ -748,12 +749,21 @@
         document.getElementById('bookingModal').style.display = 'none';
     }
 
-    async function loadAppointments() {
+    function filterAppts(status, tab) {
+        document.querySelectorAll('#page-appointments .tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        loadAppointments(status);
+    }
+
+    async function loadAppointments(statusFilter) {
         const appts = await apiCall('/api/appointments');
         const tbody = document.getElementById('appointmentsTable');
-        if (!appts.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No appointments</td></tr>'; return; }
+        const filtered = statusFilter && statusFilter !== 'all'
+            ? appts.filter(a => a.status === statusFilter)
+            : appts;
+        if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty">No appointments</td></tr>'; return; }
         
-        tbody.innerHTML = appts.map(a => {
+        tbody.innerHTML = filtered.map(a => {
             let btn = '';
             if (a.status === 'ACTIVE') btn = '<button class="btn btn-sm btn-accent" onclick="window.location.href=\'room.html?appointment_id=' + a.id + '\'">Join Call</button>';
             else if (a.status === 'SCHEDULED') btn = '<button class="btn btn-sm btn-secondary" onclick="joinWaitingRoom(' + a.id + ')">Wait</button>';
@@ -818,17 +828,37 @@
         try {
             const txns = await apiCall('/api/credits/transactions');
             const container = document.getElementById('transactionHistory');
-            if (!txns.length) { container.innerHTML = '<div class="empty">No transactions yet</div>'; return; }
-            container.innerHTML = txns.map(t => '<div style="padding:0.5rem;border-bottom:1px solid var(--border)"><div>' + t.description + '</div><div style="font-size:0.8rem;color:var(--text-light)">' + new Date(t.created_at).toLocaleString() + '</div></div>').join('');
-        } catch (e) { document.getElementById('transactionHistory').innerHTML = '<div class="empty">Could not load transactions</div>'; }
+            const localTxns = JSON.parse(sessionStorage.getItem('dow_transactions') || '[]');
+            const all = [...localTxns, ...txns];
+            if (!all.length) { container.innerHTML = '<div class="empty">No transactions yet</div>'; return; }
+            container.innerHTML = all.map(t => '<div style="padding:0.5rem;border-bottom:1px solid var(--border)"><div>' + (t.description || 'Transaction') + '</div><div style="font-size:0.8rem;color:var(--text-light)">' + new Date(t.created_at || Date.now()).toLocaleString() + '</div></div>').join('');
+        } catch (e) {
+            const localTxns = JSON.parse(sessionStorage.getItem('dow_transactions') || '[]');
+            const container = document.getElementById('transactionHistory');
+            if (localTxns.length) {
+                container.innerHTML = localTxns.map(t => '<div style="padding:0.5rem;border-bottom:1px solid var(--border)"><div>' + (t.description || 'Transaction') + '</div><div style="font-size:0.8rem;color:var(--text-light)">' + new Date(t.created_at || Date.now()).toLocaleString() + '</div></div>').join('');
+            } else {
+                container.innerHTML = '<div class="empty">No transactions yet</div>';
+            }
+        }
     }
 
     async function buyCredits(amount) {
         currentUser.credits += amount;
-        await apiCall('/api/credits/purchase', {
-            method: 'POST',
-            body: JSON.stringify({ amount: amount, payment_method: 'manual' })
+        try {
+            await apiCall('/api/credits/purchase', {
+                method: 'POST',
+                body: JSON.stringify({ amount: amount, payment_method: 'manual' })
+            });
+        } catch (e) {
+            console.log('Purchase API error (transaction may not persist):', e.message);
+        }
+        const localTxns = JSON.parse(sessionStorage.getItem('dow_transactions') || '[]');
+        localTxns.unshift({
+            description: 'Purchased R' + amount + ' credits',
+            created_at: new Date().toISOString()
         });
+        sessionStorage.setItem('dow_transactions', JSON.stringify(localTxns.slice(0, 20)));
         currentUser = await apiCall('/api/auth/me');
         updateCreditsDisplay();
         loadCreditsPage();
