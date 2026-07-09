@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX7H7BJ8XY"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZX7H7BJ8XY');
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctors on Wheels | EM Guidance Portal</title>
@@ -83,10 +92,48 @@
         .modal-body { padding: 2rem; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 
         .hidden { display: none !important; }
-    </style>
-</head>
-<body>
-    <div class="app-shell">
+
+        /* Mobile */
+        .hamburger { display: none; align-items: center; justify-content: center; width: 40px; height: 40px; border: none; background: transparent; color: var(--em-text-main); font-size: 1.4rem; cursor: pointer; border-radius: 8px; }
+        .hamburger:hover { background: var(--em-light-blue); color: var(--em-blue); }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 800; }
+        .sidebar-overlay.active { display: block; }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .sidebar.mobile-open { display: flex !important; transform: translateX(0) !important; }
+            .main-stage { margin-left: 0; }
+            .header { padding: 0 1rem; }
+            .hamburger { display: flex !important; }
+.search-bar { display: none; }
+         }
+
+         /* Splash Screen */
+         .splash-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--em-dark-blue),var(--em-blue));display:flex;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.3s ease}
+         .splash-screen.hidden{opacity:0;pointer-events:none}
+         .splash-content{text-align:center;color:#fff}
+         .splash-content i{font-size:4rem;margin-bottom:1rem;animation:pulse 1.5s ease-in-out infinite}
+         .splash-content h2{font-size:1.8rem;margin-bottom:0.5rem}
+         .loading-dots{font-size:1.2rem}
+         .loading-dots span{animation:blink 1.5s infinite;opacity:0}
+         .loading-dots span:nth-child(2){animation-delay:0.25s}
+         .loading-dots span:nth-child(3){animation-delay:0.5s}
+         @keyframes blink{0%,100%{opacity:0}50%{opacity:1}}
+         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+         .sidebar{transition:transform 0.3s ease}
+     </style>
+    </head>
+    <body>
+        <!-- Loading Splash Screen -->
+        <div id="splashScreen" class="splash-screen">
+            <div class="splash-content">
+                <i class="fas fa-notes-medical"></i>
+                <h2>Doctors on Wheels</h2>
+                <div class="loading-dots">Loading<span>.</span><span>.</span><span>.</span></div>
+            </div>
+        </div>
+        <div class="app-shell">
+        <div class="sidebar-overlay" onclick="closeMobileMenu()"></div>
         <aside class="sidebar">
             <div class="sidebar-brand">
                 <i class="fas fa-notes-medical"></i>
@@ -112,6 +159,7 @@
 
         <main class="main-stage">
             <header class="header">
+                <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Toggle menu"><i class="fas fa-bars"></i></button>
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Find guidance, drugs, or patient files...">
@@ -243,11 +291,11 @@
                             </div>
                         </div>
                         <div style="text-align:right; font-size:0.85rem;">
-                            <strong id="docHeaderName" style="font-size:1.1rem;">Dr. Sarah Smith</strong><br>
-                            <span id="docSpecialty">General Practitioner</span><br>
+                            <strong id="docHeaderName" style="font-size:1.1rem;"></strong><br>
+                            <span id="docSpecialty"></span><br>
                             <p style="margin-top:0.5rem;">
-                                HPCSA: <span id="docHpcsa">Pending</span><br>
-                                PR No: <span id="docPr">Pending</span>
+                                HPCSA: <span id="docHpcsa"></span><br>
+                                PR No: <span id="docPr"></span>
                             </p>
                         </div>
                     </div>
@@ -288,25 +336,26 @@
         let authToken = localStorage.getItem('token');
         let currentAppointments = [];
 
-        // ========== AUTH & INIT ==========
+// ========== AUTH & INIT ==========
         async function init() {
-            if (!authToken) { window.location.href = 'login.html'; return; }
+            if (!authToken) { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'login.html'; return; }
             try {
                 const user = await apiCall('/api/auth/me');
-                if (user.role !== 'DOCTOR') { window.location.href = 'index.html'; return; }
+                if (user.role !== 'DOCTOR') { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'index.html'; return; }
                 document.getElementById('displayDocName').textContent = user.name;
-                
-                // Set doc details in document generator
-                document.getElementById('docHeaderName').textContent = user.name;
-                document.getElementById('docSignature').textContent = user.name;
-                
-                loadStats();
-                loadProfile();
+                document.getElementById('splashScreen').classList.add('hidden');
+                await loadProfile();
                 updateBalance();
+                loadStats();
             } catch (e) { handleLogout(); }
         }
 
-        function handleLogout() { localStorage.removeItem('token'); window.location.href = 'login.html'; }
+        function handleLogout() {
+            authToken = null;
+            localStorage.removeItem('token');
+            document.getElementById('splashScreen').classList.remove('hidden');
+            window.location.href = 'login.html';
+        }
 
         async function apiCall(endpoint, options = {}) {
             const headers = { 'Content-Type': 'application/json' };
@@ -464,6 +513,13 @@
                 const btn = document.getElementById('gigToggleBtn');
                 btn.textContent = profile.is_online ? 'Disable Home Visits' : 'Enable Home Visits';
                 btn.className = profile.is_online ? 'btn btn-danger' : 'btn btn-primary';
+
+                document.getElementById('displayDocName').textContent = profile.name || '';
+                document.getElementById('docHeaderName').textContent = profile.name || '';
+                document.getElementById('docSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+                document.getElementById('docSpecialty').textContent = profile.specialty || 'Medical Practitioner';
+                document.getElementById('docHpcsa').textContent = profile.hpcsa_number || 'Verified';
+                document.getElementById('docPr').textContent = profile.practice_number || 'Registered';
             } catch (e) {}
         }
 
@@ -524,7 +580,32 @@
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
             document.querySelector(`[data-target="${t}"]`)?.classList.add('active');
             if (t === 'scripts') loadScripts();
+            if (window.innerWidth <= 768) closeMobileMenu();
         }
+
+        function toggleMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                const isOpen = sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active', isOpen);
+                document.body.style.overflow = isOpen ? 'hidden' : '';
+            }
+        }
+
+        function closeMobileMenu() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.remove('mobile-open');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) closeMobileMenu();
+        });
 
         document.querySelectorAll('.nav-item[data-target]').forEach(i => i.onclick = () => navigateTo(i.dataset.target));
 

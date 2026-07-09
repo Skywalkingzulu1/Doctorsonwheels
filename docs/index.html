@@ -465,6 +465,11 @@
         if (authToken) {
             try {
                 currentUser = await apiCall('/api/auth/me');
+                // Redirect ADMIN users to their dedicated dashboard
+                if (currentUser && currentUser.role === 'ADMIN') {
+                    window.location.href = 'admin_live.html';
+                    return;
+                }
                 showApp();
             } catch (e) {
                 localStorage.removeItem('token');
