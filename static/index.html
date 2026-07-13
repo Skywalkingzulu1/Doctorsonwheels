@@ -260,12 +260,10 @@
                 <div id="calloutFeeLine" style="display:none;color:var(--text-light)"><span>Callout Fee:</span><span>R<span id="calloutFeePrice">0</span></span></div>
                 <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem"><span>Total:</span><span>R<span id="totalPrice">0</span></span></div>
                 <div style="display:flex;flex-direction:column;gap:0.8rem;padding-top:0.8rem;margin-top:0.8rem;border-top:1px solid var(--border)">
-                    <label style="font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:8px;cursor:pointer">
-                        <input type="radio" name="payMethod" id="payWithCredits" checked style="width:18px;height:18px"> Pay with Rands (Wallet Balance)
-                    </label>
-                    <label style="font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:8px;cursor:pointer">
-                        <input type="radio" name="payMethod" id="payWithYoco" style="width:18px;height:18px"> Pay with Yoco (Credit/Debit Card)
-                    </label>
+                    <div style="font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:8px;color:var(--text)">
+                        <i class="fas fa-credit-card" style="color:var(--primary)"></i> Pay with Yoco Secure Checkout (Credit/Debit Card)
+                        <input type="radio" name="payMethod" id="payWithYoco" checked style="display:none">
+                    </div>
                 </div>
             </div>
             
@@ -698,7 +696,7 @@
                     reason: reason || triageData.chief_complaint,
                     location: type === 'INPERSON' ? location : null,
                     distance_km: distance,
-                    payment_method: payMethod === 'payWithYoco' ? 'yoco' : 'credits',
+                    payment_method: 'yoco',
                     triage_data: JSON.stringify(triageData)
                 })
             });
