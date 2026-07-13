@@ -143,7 +143,7 @@
                 <div class="menu-item active" data-page="dashboard"><i class="fas fa-home"></i> Dashboard</div>
                 <div class="menu-item" data-page="doctors"><i class="fas fa-user-md"></i> Find Doctors</div>
                 <div class="menu-item" data-page="appointments"><i class="fas fa-calendar"></i> Appointments <span class="menu-badge" id="apptBadge">0</span></div>
-                <div class="menu-item" data-page="credits"><i class="fas fa-coins"></i> Balance</div>
+                <div class="menu-item" data-page="credits" style="display:none"><i class="fas fa-coins"></i> Balance</div>
                 <div class="menu-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
             </div>
         </div>
@@ -154,7 +154,7 @@
                 <div id="pageTitle" style="font-weight:600">Dashboard</div>
                 <div class="user-info">
                     <span id="userName">User</span>
-                    <span class="wallet" id="userCredits" style="margin-left:1rem;color:var(--accent)">R0.00</span>
+                    <span class="wallet" id="userCredits" style="display:none">R0.00</span>
                 </div>
             </div>
 
@@ -170,7 +170,7 @@
                     </div>
                     <div class="stats grid" style="margin-bottom:2rem">
                         <div class="stat-card"><div class="stat-value" id="statAppointments">0</div><div class="stat-label">Appointments</div></div>
-                        <div class="stat-card"><div class="stat-value" id="statCredits">R0.00</div><div class="stat-label">Balance</div></div>
+                        <div class="stat-card" style="display:none"><div class="stat-value" id="statCredits">R0.00</div><div class="stat-label">Balance</div></div>
                         <div class="stat-card"><div class="stat-value" id="statDoctors">0</div><div class="stat-label">Doctors</div></div>
                     </div>
                 </div>
