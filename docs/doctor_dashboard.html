@@ -151,6 +151,7 @@
                 <div class="nav-label">Medical Tools</div>
                 <div class="nav-item" data-target="ai-tools"><i class="fas fa-wand-sparkles"></i> AI Scribe</div>
                 <div class="nav-item" data-target="pricing"><i class="fas fa-coins"></i> Billing</div>
+                <div class="nav-item" data-target="make-notes"><i class="fas fa-file-signature"></i> Create Notes & Letters</div>
                 <div class="nav-item" data-target="templates"><i class="fas fa-file-pdf"></i> Document Templates</div>
             </nav>
             <div style="padding: 1.5rem; border-top: 1px solid var(--em-border);">
@@ -239,6 +240,89 @@
                 <!-- MORE VIEWS -->
                 <section id="view-patients" class="hidden"><div class="page-title"><h2>Patient Registry</h2></div><div class="em-card"><table class="em-table"><thead><tr><th>Name</th><th>Email</th><th>Last Visit</th></tr></thead><tbody id="patientsBody"></tbody></table></div></section>
                 <section id="view-pricing" class="hidden"><div class="page-title"><h2>Billing Structure</h2></div><div class="em-card"><div class="card-body" id="pricingBody"></div></div></section>
+                
+                <!-- VIEW: CREATE NOTES & LETTERS -->
+                <section id="view-make-notes" class="hidden">
+                    <div class="page-title"><h2>Create Clinical Notes & Letters</h2></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap:2rem; align-items:start;">
+                        <!-- Input Card -->
+                        <div class="em-card">
+                            <div class="card-header">Document Parameters</div>
+                            <div class="card-body">
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label class="nav-label" style="padding:0; margin-bottom:0.5rem; display:block;">Patient Name</label>
+                                    <input type="text" id="directPatientName" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" placeholder="e.g. John Doe">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 1.5rem;">
+                                    <label class="nav-label" style="padding:0; margin-bottom:0.5rem; display:block;">Clinical Details / Context</label>
+                                    <textarea id="directScribeContext" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" rows="5" placeholder="Include any consultation notes, diagnoses, or instructions..."></textarea>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                                    <button class="btn btn-ghost" onclick="generateDirectDocument('Sick Note')"><i class="fas fa-bed"></i> Generate Sick Note</button>
+                                    <button class="btn btn-ghost" onclick="generateDirectDocument('Prescription')"><i class="fas fa-pills"></i> Generate Prescription</button>
+                                    <button class="btn btn-ghost" onclick="generateDirectDocument('Referral Letter')"><i class="fas fa-file-export"></i> Generate Referral Letter</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview Card -->
+                        <div class="em-card">
+                            <div class="card-header">Document Preview</div>
+                            <div class="card-body" style="background:#f1f5f9; padding:1rem;">
+                                <div id="directDocumentPreview" class="hidden" style="border:1px solid var(--em-border); padding:2rem; background:white; font-family:'Times New Roman', serif; position:relative; min-height:500px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                                    <!-- Header -->
+                                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; padding-bottom:1.5rem; margin-bottom:2rem;">
+                                        <div style="display:flex; align-items:center; gap:1rem;">
+                                            <img src="/WhatsApp Image 2026-06-01 at 15.56.03.jpeg" style="height:80px; object-fit:contain;" alt="Doctors on Wheels Logo">
+                                            <div>
+                                                <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px; font-size:1.4rem;">Doctors on Wheels</h2>
+                                                <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
+                                                <p style="font-size:0.8rem; color:#333; margin:0; font-weight:600;">Dr Sam: 072 973 4610 | Doctorsonwheels@outlook.com</p>
+                                            </div>
+                                        </div>
+                                        <div style="text-align:right; font-size:0.85rem;">
+                                            <strong id="directDocHeaderName" style="font-size:1.1rem;"></strong><br>
+                                            <span id="directDocSpecialty"></span><br>
+                                            <p style="margin-top:0.5rem;">
+                                                HPCSA: <span id="directDocHpcsa"></span><br>
+                                                PR No: <span id="directDocPr"></span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div style="text-align:center; margin-bottom:2rem;">
+                                        <h3 id="directDocTitle" style="text-decoration:underline; text-transform:uppercase;">Medical Report</h3>
+                                    </div>
+
+                                    <!-- Body -->
+                                    <div id="directDocumentContent" style="white-space: pre-wrap; font-size:1.1rem; line-height:1.6; color:#1a1a1a;"></div>
+
+                                    <!-- Footer -->
+                                    <div style="margin-top:3rem; padding-top:1rem; border-top:1px solid #eee;">
+                                        <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+                                            <div>
+                                                <p><strong>Date:</strong> <span id="directDocDate"></span></p>
+                                                <p><strong>Location:</strong> Digital Consultation / Home Visit</p>
+                                            </div>
+                                            <div style="text-align:center;">
+                                                <div style="font-family:'Dancing Script', cursive; font-size:1.5rem; border-bottom:1px solid #333; margin-bottom:0.5rem; padding:0 1rem;" id="directDocSignature"></div>
+                                                <p style="font-size:0.8rem; color:#666;">Electronically Signed</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="btn btn-primary" style="margin-top:2rem; width:100%; justify-content:center;" onclick="notify('Document Saved & Shared', 'success')">
+                                        <i class="fas fa-save"></i> Save & Send
+                                    </button>
+                                </div>
+                                <div id="directPreviewPlaceholder" style="text-align:center; padding:5rem 2rem; color:var(--em-text-muted);">
+                                    <i class="fas fa-file-signature" style="font-size:4rem; margin-bottom:1rem; opacity:0.3;"></i>
+                                    <p>Fill in patient details, add clinical context, and select a document type to generate a preview.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
                 
                 <!-- VIEW: DOCUMENT TEMPLATES -->
                 <section id="view-templates" class="hidden">
@@ -533,6 +617,37 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
 
             document.getElementById('documentContent').textContent = content;
             document.getElementById('documentPreview').classList.remove('hidden');
+        }
+
+        async function generateDirectDocument(type) {
+            const context = document.getElementById('directScribeContext').value;
+            const patientName = document.getElementById('directPatientName').value || "[Patient Name]";
+            
+            const profile = await apiCall('/api/profile/doctor');
+            document.getElementById('directDocSpecialty').textContent = profile.specialty || "Medical Practitioner";
+            document.getElementById('directDocHpcsa').textContent = profile.hpcsa_number || "Verified";
+            document.getElementById('directDocPr').textContent = profile.practice_number || "Registered";
+            document.getElementById('directDocHeaderName').textContent = profile.name || '';
+            document.getElementById('directDocSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+            
+            notify(`Generating ${type}...`, 'info');
+            
+            let content = "";
+            const today = new Date().toLocaleDateString('en-ZA');
+            document.getElementById('directDocTitle').textContent = type;
+            document.getElementById('directDocDate').textContent = today;
+
+            if (type === 'Sick Note') {
+                content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ${context}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+            } else if (type === 'Prescription') {
+                content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n1. Medication A (e.g. Amoxicillin 500mg)\n   Sig: 1 tab PO TID x 5 days\n   Mitte: 15 tabs\n\n2. Medication B (e.g. Paracetamol 500mg)\n   Sig: 2 tabs PO QID PRN for pain\n   Mitte: 20 tabs\n\nRefills: 0\n\nNotes: ${context}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+            } else if (type === 'Referral Letter') {
+                content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n- Patient presented with symptoms as described in the consultation.\n- Initial assessment suggests specialized intervention may be required.\n\nContext & Notes: ${context}\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+            }
+
+            document.getElementById('directDocumentContent').textContent = content;
+            document.getElementById('directPreviewPlaceholder').classList.add('hidden');
+            document.getElementById('directDocumentPreview').classList.remove('hidden');
         }
 
         async function updateBalance() {
