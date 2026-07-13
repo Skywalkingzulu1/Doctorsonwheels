@@ -151,6 +151,7 @@
                 <div class="nav-label">Medical Tools</div>
                 <div class="nav-item" data-target="ai-tools"><i class="fas fa-wand-sparkles"></i> AI Scribe</div>
                 <div class="nav-item" data-target="pricing"><i class="fas fa-coins"></i> Billing</div>
+                <div class="nav-item" data-target="templates"><i class="fas fa-file-pdf"></i> Document Templates</div>
             </nav>
             <div style="padding: 1.5rem; border-top: 1px solid var(--em-border);">
                 <div class="nav-item" onclick="handleLogout()" style="color: var(--em-danger);"><i class="fas fa-sign-out"></i> Log Out</div>
@@ -238,6 +239,37 @@
                 <!-- MORE VIEWS -->
                 <section id="view-patients" class="hidden"><div class="page-title"><h2>Patient Registry</h2></div><div class="em-card"><table class="em-table"><thead><tr><th>Name</th><th>Email</th><th>Last Visit</th></tr></thead><tbody id="patientsBody"></tbody></table></div></section>
                 <section id="view-pricing" class="hidden"><div class="page-title"><h2>Billing Structure</h2></div><div class="em-card"><div class="card-body" id="pricingBody"></div></div></section>
+                
+                <!-- VIEW: DOCUMENT TEMPLATES -->
+                <section id="view-templates" class="hidden">
+                    <div class="page-title"><h2>Document Templates & Forms</h2></div>
+                    <div class="script-grid">
+                        <div class="em-card">
+                            <div class="card-body" style="text-align:center; padding:2rem;">
+                                <i class="fas fa-file-medical-alt" style="font-size:3rem; color:var(--em-blue); margin-bottom:1rem;"></i>
+                                <h3 style="margin-bottom:0.5rem;">Medical Certificate</h3>
+                                <p style="font-size:0.85rem; color:var(--em-text-muted); margin-bottom:1.5rem;">Standard Medical Certificate (Sick Note) template.</p>
+                                <a href="medical_certificate.pdf" target="_blank" class="btn btn-primary"><i class="fas fa-download"></i> View / Download</a>
+                            </div>
+                        </div>
+                        <div class="em-card">
+                            <div class="card-body" style="text-align:center; padding:2rem;">
+                                <i class="fas fa-prescription-bottle-medical" style="font-size:3rem; color:var(--em-blue); margin-bottom:1rem;"></i>
+                                <h3 style="margin-bottom:0.5rem;">Prescription Form</h3>
+                                <p style="font-size:0.85rem; color:var(--em-text-muted); margin-bottom:1.5rem;">Official prescription form and medicine schedule template.</p>
+                                <a href="prescription.pdf" target="_blank" class="btn btn-primary"><i class="fas fa-download"></i> View / Download</a>
+                            </div>
+                        </div>
+                        <div class="em-card">
+                            <div class="card-body" style="text-align:center; padding:2rem;">
+                                <i class="fas fa-file-export" style="font-size:3rem; color:var(--em-blue); margin-bottom:1rem;"></i>
+                                <h3 style="margin-bottom:0.5rem;">Referral Letter</h3>
+                                <p style="font-size:0.85rem; color:var(--em-text-muted); margin-bottom:1.5rem;">Patient referral letter template for specialists.</p>
+                                <a href="referral_letter.pdf" target="_blank" class="btn btn-primary"><i class="fas fa-download"></i> View / Download</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
@@ -288,6 +320,7 @@
                             <div>
                                 <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px;">Doctors on Wheels</h2>
                                 <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
+                                <p style="font-size:0.8rem; color:#333; margin:0; font-weight:600;">Dr Sam: 072 973 4610 | Doctorsonwheels@outlook.com</p>
                             </div>
                         </div>
                         <div style="text-align:right; font-size:0.85rem;">
@@ -489,11 +522,13 @@
             document.getElementById('docTitle').textContent = type;
 
             if (type === 'Sick Note') {
-                content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ${context}`;
+                content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ${context}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
             } else if (type === 'Prescription') {
-                content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n1. Medication A (e.g. Amoxicillin 500mg)\n   Sig: 1 tab PO TID x 5 days\n   Mitte: 15 tabs\n\n2. Medication B (e.g. Paracetamol 500mg)\n   Sig: 2 tabs PO QID PRN for pain\n   Mitte: 20 tabs\n\nRefills: 0\n\nNotes: ${context}`;
+                content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n1. Medication A (e.g. Amoxicillin 500mg)\n   Sig: 1 tab PO TID x 5 days\n   Mitte: 15 tabs\n\n2. Medication B (e.g. Paracetamol 500mg)\n   Sig: 2 tabs PO QID PRN for pain\n   Mitte: 20 tabs\n\nRefills: 0\n\nNotes: ${context}\n\n---
+Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
             } else if (type === 'Referral Letter') {
-                content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n- Patient presented with symptoms as described in the consultation.\n- Initial assessment suggests specialized intervention may be required.\n\nContext & Notes: ${context}\n\nThank you for your assistance in the ongoing care of this patient.`;
+                content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n- Patient presented with symptoms as described in the consultation.\n- Initial assessment suggests specialized intervention may be required.\n\nContext & Notes: ${context}\n\nThank you for your assistance in the ongoing care of this patient.\n\n---
+Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
             }
 
             document.getElementById('documentContent').textContent = content;
