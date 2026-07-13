@@ -1,2 +1,7 @@
 # Ignore the local trash folder
 trash/
+
+# Ignore sensitive environment variable files
+.env
+.env.local
+.env.production
