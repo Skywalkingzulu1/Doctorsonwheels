@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --em-blue: #0055ff;
@@ -275,7 +276,7 @@
                                     <!-- Header -->
                                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; padding-bottom:1.5rem; margin-bottom:2rem;">
                                         <div style="display:flex; align-items:center; gap:1rem;">
-                                            <img src="/WhatsApp Image 2026-06-01 at 15.56.03.jpeg" style="height:80px; object-fit:contain;" alt="Doctors on Wheels Logo">
+                                            <div style="width:80px; height:80px; background:var(--em-blue); color:white; display:flex; align-items:center; justify-content:center; border-radius:12px; font-weight:800; font-size:1.5rem;">DoW</div>
                                             <div>
                                                 <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px; font-size:1.4rem;">Doctors on Wheels</h2>
                                                 <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
@@ -313,9 +314,17 @@
                                         </div>
                                     </div>
                                     
-                                    <button class="btn btn-primary" style="margin-top:2rem; width:100%; justify-content:center;" onclick="saveDirectDocument()">
-                                        <i class="fas fa-save"></i> Save & Send
-                                    </button>
+                                    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:2rem;">
+                                        <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="downloadDirectDocument()">
+                                            <i class="fas fa-download"></i> Download PDF
+                                        </button>
+                                        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="emailDirectDocument()">
+                                            <i class="fas fa-envelope"></i> Email to Patient
+                                        </button>
+                                        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="saveDirectDocument()">
+                                            <i class="fas fa-save"></i> Save to Records
+                                        </button>
+                                    </div>
                                 </div>
                                 <div id="directPreviewPlaceholder" style="text-align:center; padding:5rem 2rem; color:var(--em-text-muted);">
                                     <i class="fas fa-file-signature" style="font-size:4rem; margin-bottom:1rem; opacity:0.3;"></i>
@@ -622,35 +631,40 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
         }
 
         async function generateDirectDocument(type) {
-            const context = document.getElementById('directScribeContext').value;
-            const select = document.getElementById('directPatientSelect');
-            const patientName = select.value ? select.options[select.selectedIndex].text : "[Patient Name]";
-            
-            const profile = await apiCall('/api/profile/doctor');
-            document.getElementById('directDocSpecialty').textContent = profile.specialty || "Medical Practitioner";
-            document.getElementById('directDocHpcsa').textContent = profile.hpcsa_number || "Verified";
-            document.getElementById('directDocPr').textContent = profile.practice_number || "Registered";
-            document.getElementById('directDocHeaderName').textContent = profile.name || '';
-            document.getElementById('directDocSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
-            
-            notify(`Generating ${type}...`, 'info');
-            
-            let content = "";
-            const today = new Date().toLocaleDateString('en-ZA');
-            document.getElementById('directDocTitle').textContent = type;
-            document.getElementById('directDocDate').textContent = today;
+            try {
+                const context = document.getElementById('directScribeContext').value;
+                const select = document.getElementById('directPatientSelect');
+                const patientName = select.value ? select.options[select.selectedIndex].text : "[Patient Name]";
+                
+                const profile = await apiCall('/api/profile/doctor');
+                document.getElementById('directDocSpecialty').textContent = profile.specialty || "Medical Practitioner";
+                document.getElementById('directDocHpcsa').textContent = profile.hpcsa_number || "Verified";
+                document.getElementById('directDocPr').textContent = profile.practice_number || "Registered";
+                document.getElementById('directDocHeaderName').textContent = profile.name || '';
+                document.getElementById('directDocSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+                
+                notify(`Generating ${type}...`, 'info');
+                
+                let content = "";
+                const today = new Date().toLocaleDateString('en-ZA');
+                document.getElementById('directDocTitle').textContent = type;
+                document.getElementById('directDocDate').textContent = today;
 
-            if (type === 'Sick Note') {
-                content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ${context}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
-            } else if (type === 'Prescription') {
-                content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n1. Medication A (e.g. Amoxicillin 500mg)\n   Sig: 1 tab PO TID x 5 days\n   Mitte: 15 tabs\n\n2. Medication B (e.g. Paracetamol 500mg)\n   Sig: 2 tabs PO QID PRN for pain\n   Mitte: 20 tabs\n\nRefills: 0\n\nNotes: ${context}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
-            } else if (type === 'Referral Letter') {
-                content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n- Patient presented with symptoms as described in the consultation.\n- Initial assessment suggests specialized intervention may be required.\n\nContext & Notes: ${context}\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                if (type === 'Sick Note') {
+                    content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context:\n${context || 'No additional context provided.'}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                } else if (type === 'Prescription') {
+                    content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n${context || 'No medications specified. Please use the Clinical Details field to list medications, dosages, and instructions.'}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                } else if (type === 'Referral Letter') {
+                    content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n${context || 'No clinical context provided. Please use the Clinical Details field to describe the patient condition and reason for referral.'}\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                }
+
+                document.getElementById('directDocumentContent').textContent = content;
+                document.getElementById('directPreviewPlaceholder').classList.add('hidden');
+                document.getElementById('directDocumentPreview').classList.remove('hidden');
+            } catch (e) {
+                notify('Failed to generate document: ' + e.message, 'error');
+                console.error('generateDirectDocument error:', e);
             }
-
-            document.getElementById('directDocumentContent').textContent = content;
-            document.getElementById('directPreviewPlaceholder').classList.add('hidden');
-            document.getElementById('directDocumentPreview').classList.remove('hidden');
         }
 
         async function updateBalance() {
@@ -780,7 +794,7 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
             const content = document.getElementById('directDocumentContent').textContent;
             
             try {
-                notify(`Saving and sending ${type}...`, 'info');
+                notify(`Saving ${type}...`, 'info');
                 const profile = await apiCall('/api/profile/doctor');
                 
                 if (type === 'Prescription') {
@@ -806,14 +820,58 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
                         })
                     });
                 }
-                notify('Document Saved & Shared Successfully', 'success');
-                select.value = '';
-                document.getElementById('directScribeContext').value = '';
-                document.getElementById('directDocumentPreview').classList.add('hidden');
-                document.getElementById('directPreviewPlaceholder').classList.remove('hidden');
+                notify('Document saved to records', 'success');
             } catch (e) {
                 notify('Failed to save document: ' + e.message, 'error');
             }
+        }
+
+        function downloadDirectDocument() {
+            const preview = document.getElementById('directDocumentPreview');
+            if (preview.classList.contains('hidden')) {
+                notify('Generate a document first', 'error');
+                return;
+            }
+            const title = document.getElementById('directDocTitle').textContent || 'document';
+            const filename = `${title.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+            notify('Generating PDF...', 'info');
+            html2pdf().set({
+                margin: 10,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            }).from(preview).save().then(() => {
+                notify('PDF downloaded: ' + filename, 'success');
+            }).catch(e => {
+                notify('PDF generation failed: ' + e.message, 'error');
+            });
+        }
+
+        function emailDirectDocument() {
+            const select = document.getElementById('directPatientSelect');
+            if (!select.value) {
+                notify('Please select a patient first', 'error');
+                return;
+            }
+            const patientName = select.options[select.selectedIndex].text;
+            const type = document.getElementById('directDocTitle').textContent;
+            const content = document.getElementById('directDocumentContent').textContent;
+            if (!content) {
+                notify('Generate a document first', 'error');
+                return;
+            }
+            const email = prompt(`Enter email address for ${patientName}:`, '');
+            if (!email) return;
+            notify('Sending email...', 'info');
+            apiCall('/api/somnia/agent/email', {
+                method: 'POST',
+                body: JSON.stringify({ recipient: email, subject: `Doctors on Wheels - ${type}`, body: content })
+            }).then(() => {
+                notify('Email sent to ' + email, 'success');
+            }).catch(e => {
+                notify('Failed to send email: ' + e.message, 'error');
+            });
         }
 
         async function populatePatientDropdown() {
