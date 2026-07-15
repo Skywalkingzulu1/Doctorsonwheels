@@ -756,6 +756,14 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                 }), { status: 200, headers: { 'Content-Type': 'application/json' } });
             }
 
+            if (path === '/api/patients' && method === 'GET') {
+                const emulatedEmail = localStorage.getItem('emulated_user_email');
+                if (!emulatedEmail) throw new Error('Not authenticated');
+                const { data: patients, error } = await supabase.from('Profiles').select('id, name, email, created_at').eq('role', 'PATIENT');
+                if (error) throw new Error(error.message);
+                return new Response(JSON.stringify(patients), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+
             if (path === '/api/profile/doctor' && method === 'GET') {
                 const emulatedEmail = localStorage.getItem('emulated_user_email');
                 if (!emulatedEmail) throw new Error('Not authenticated');

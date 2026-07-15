@@ -251,7 +251,9 @@
                             <div class="card-body">
                                 <div class="form-group" style="margin-bottom: 1.5rem;">
                                     <label class="nav-label" style="padding:0; margin-bottom:0.5rem; display:block;">Patient Name</label>
-                                    <input type="text" id="directPatientName" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" placeholder="e.g. John Doe">
+                                    <select id="directPatientSelect" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem; background:white;">
+                                        <option value="">Select a patient...</option>
+                                    </select>
                                 </div>
                                 <div class="form-group" style="margin-bottom: 1.5rem;">
                                     <label class="nav-label" style="padding:0; margin-bottom:0.5rem; display:block;">Clinical Details / Context</label>
@@ -311,7 +313,7 @@
                                         </div>
                                     </div>
                                     
-                                    <button class="btn btn-primary" style="margin-top:2rem; width:100%; justify-content:center;" onclick="notify('Document Saved & Shared', 'success')">
+                                    <button class="btn btn-primary" style="margin-top:2rem; width:100%; justify-content:center;" onclick="saveDirectDocument()">
                                         <i class="fas fa-save"></i> Save & Send
                                     </button>
                                 </div>
@@ -438,7 +440,7 @@
                         </div>
                     </div>
                     
-                    <button class="btn btn-primary" style="position:absolute; bottom:1rem; right:1rem;" onclick="notify('Document Saved & Shared', 'success')">
+                    <button class="btn btn-primary" style="position:absolute; bottom:1rem; right:1rem;" onclick="saveConsultationDocument()">
                         <i class="fas fa-save"></i> Save & Send
                     </button>
                 </div>
@@ -621,7 +623,8 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
 
         async function generateDirectDocument(type) {
             const context = document.getElementById('directScribeContext').value;
-            const patientName = document.getElementById('directPatientName').value || "[Patient Name]";
+            const select = document.getElementById('directPatientSelect');
+            const patientName = select.value ? select.options[select.selectedIndex].text : "[Patient Name]";
             
             const profile = await apiCall('/api/profile/doctor');
             document.getElementById('directDocSpecialty').textContent = profile.specialty || "Medical Practitioner";
@@ -724,12 +727,141 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
             setTimeout(() => t.remove(), 3000);
         }
 
+        async function saveConsultationDocument() {
+            const type = document.getElementById('docTitle').textContent;
+            const content = document.getElementById('documentContent').textContent;
+            const appt = currentAppointments.find(a => a.id === activeAppointmentId);
+            
+            if (!appt) {
+                notify('No active appointment found', 'error');
+                return;
+            }
+
+            try {
+                notify(`Saving and sending ${type}...`, 'info');
+                if (type === 'Prescription') {
+                    await apiCall('/api/prescriptions', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            appointment_id: appt.id,
+                            patient_id: appt.patient_id,
+                            doctor_id: appt.doctor_id,
+                            medication: 'Prescription',
+                            dosage: 'As per instructions',
+                            instructions: content
+                        })
+                    });
+                } else {
+                    await apiCall('/api/records', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            appointment_id: appt.id,
+                            patient_id: appt.patient_id,
+                            doctor_id: appt.doctor_id,
+                            summary: content
+                        })
+                    });
+                }
+                notify('Document Saved & Shared Successfully', 'success');
+                closeTools();
+            } catch (e) {
+                notify('Failed to save document: ' + e.message, 'error');
+            }
+        }
+
+        async function saveDirectDocument() {
+            const select = document.getElementById('directPatientSelect');
+            const patientId = select.value;
+            if (!patientId) {
+                notify('Please select a patient', 'error');
+                return;
+            }
+            const type = document.getElementById('directDocTitle').textContent;
+            const content = document.getElementById('directDocumentContent').textContent;
+            
+            try {
+                notify(`Saving and sending ${type}...`, 'info');
+                const profile = await apiCall('/api/profile/doctor');
+                
+                if (type === 'Prescription') {
+                    await apiCall('/api/prescriptions', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            appointment_id: null,
+                            patient_id: Number(patientId),
+                            doctor_id: profile.id,
+                            medication: 'Prescription',
+                            dosage: 'As per instructions',
+                            instructions: content
+                        })
+                    });
+                } else {
+                    await apiCall('/api/records', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            appointment_id: null,
+                            patient_id: Number(patientId),
+                            doctor_id: profile.id,
+                            summary: content
+                        })
+                    });
+                }
+                notify('Document Saved & Shared Successfully', 'success');
+                select.value = '';
+                document.getElementById('directScribeContext').value = '';
+                document.getElementById('directDocumentPreview').classList.add('hidden');
+                document.getElementById('directPreviewPlaceholder').classList.remove('hidden');
+            } catch (e) {
+                notify('Failed to save document: ' + e.message, 'error');
+            }
+        }
+
+        async function populatePatientDropdown() {
+            try {
+                const patients = await apiCall('/api/patients');
+                const select = document.getElementById('directPatientSelect');
+                if (!select) return;
+                select.innerHTML = '<option value="">Select a patient...</option>';
+                patients.forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = p.name;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('Error populating patient dropdown:', e);
+            }
+        }
+
+        async function loadPatients() {
+            try {
+                const patients = await apiCall('/api/patients');
+                const tbody = document.getElementById('patientsBody');
+                if (!tbody) return;
+                if (!patients.length) {
+                    tbody.innerHTML = '<tr><td colspan="3" class="empty">No patients registered</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = patients.map(p => `
+                    <tr>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.email}</td>
+                        <td>${new Date(p.created_at || Date.now()).toLocaleDateString('en-ZA')}</td>
+                    </tr>
+                `).join('');
+            } catch (e) {
+                console.error('Error loading patients:', e);
+            }
+        }
+
         function navigateTo(t) {
             document.querySelectorAll('section[id^="view-"]').forEach(s => s.classList.add('hidden'));
             document.getElementById('view-' + t).classList.remove('hidden');
             document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
             document.querySelector(`[data-target="${t}"]`)?.classList.add('active');
             if (t === 'scripts') loadScripts();
+            if (t === 'patients') loadPatients();
+            if (t === 'make-notes') populatePatientDropdown();
             if (window.innerWidth <= 768) closeMobileMenu();
         }
 
