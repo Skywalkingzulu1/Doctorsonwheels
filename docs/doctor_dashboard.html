@@ -260,10 +260,26 @@
                                     <label class="nav-label" style="padding:0; margin-bottom:0.5rem; display:block;">Clinical Details / Context</label>
                                     <textarea id="directScribeContext" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" rows="5" placeholder="Include any consultation notes, diagnoses, or instructions..."></textarea>
                                 </div>
+                                <div id="directPrescriptionFields" class="hidden" style="margin-bottom:1rem; padding:0.75rem; background:var(--em-light-blue); border-radius:8px; border:1px solid var(--em-blue);">
+                                    <div style="font-size:0.75rem; font-weight:700; color:var(--em-blue); margin-bottom:0.5rem; text-transform:uppercase;">
+                                        <i class="fas fa-prescription"></i> Medication Details
+                                    </div>
+                                    <div id="directMedList">
+                                        <div class="direct-med-row" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 40px; gap:0.4rem; margin-bottom:0.4rem; align-items:center;">
+                                            <input class="dmed-name" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Medication name">
+                                            <input class="dmed-dose" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Dose">
+                                            <input class="dmed-freq" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Frequency">
+                                            <input class="dmed-qty" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Qty">
+                                            <button class="btn btn-sm btn-danger" onclick="this.closest('.direct-med-row').remove()" style="padding:0.2rem 0.4rem;">&times;</button>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-sm btn-ghost" onclick="addDirectMedRow()" style="margin-top:0.3rem;"><i class="fas fa-plus"></i> Add Medication</button>
+                                </div>
                                 <div style="display:flex; flex-direction:column; gap:0.75rem;">
                                     <button class="btn btn-ghost" onclick="generateDirectDocument('Sick Note')"><i class="fas fa-bed"></i> Generate Sick Note</button>
-                                    <button class="btn btn-ghost" onclick="generateDirectDocument('Prescription')"><i class="fas fa-pills"></i> Generate Prescription</button>
+                                    <button class="btn btn-ghost" onclick="showDirectPrescriptionFields(); generateDirectDocument('Prescription')"><i class="fas fa-pills"></i> Generate Prescription</button>
                                     <button class="btn btn-ghost" onclick="generateDirectDocument('Referral Letter')"><i class="fas fa-file-export"></i> Generate Referral Letter</button>
+                                    <button class="btn btn-ghost" onclick="generateDirectDocument('Clinical Note')"><i class="fas fa-notes-medical"></i> Generate Clinical Note</button>
                                 </div>
                             </div>
                         </div>
@@ -401,17 +417,34 @@
                     <textarea id="scribeContext" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" rows="3" placeholder="Notes from consultation to include in document..."></textarea>
                 </div>
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem; margin-bottom:1.5rem;">
-                    <button class="btn btn-ghost" onclick="generateDocument('Sick Note')"><i class="fas fa-bed"></i> Sick Note</button>
-                    <button class="btn btn-ghost" onclick="generateDocument('Prescription')"><i class="fas fa-pills"></i> Prescription</button>
-                    <button class="btn btn-ghost" onclick="generateDocument('Referral Letter')"><i class="fas fa-file-export"></i> Referral</button>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:0.5rem; margin-bottom:1.5rem;">
+                    <button class="btn btn-ghost btn-sm" onclick="generateDocument('Sick Note')"><i class="fas fa-bed"></i> Sick Note</button>
+                    <button class="btn btn-ghost btn-sm" onclick="showPrescriptionFields(); generateDocument('Prescription')"><i class="fas fa-pills"></i> Prescription</button>
+                    <button class="btn btn-ghost btn-sm" onclick="generateDocument('Referral Letter')"><i class="fas fa-file-export"></i> Referral</button>
+                    <button class="btn btn-ghost btn-sm" onclick="generateDocument('Clinical Note')"><i class="fas fa-notes-medical"></i> Clinical Note</button>
+                </div>
+
+                <div id="prescriptionFields" class="hidden" style="margin-bottom:1.5rem; padding:1rem; background:var(--em-light-blue); border-radius:8px; border:1px solid var(--em-blue);">
+                    <div style="font-size:0.8rem; font-weight:700; color:var(--em-blue); margin-bottom:0.75rem; text-transform:uppercase;">
+                        <i class="fas fa-prescription"></i> Medication Details
+                    </div>
+                    <div id="medList">
+                        <div class="med-row" style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr 40px; gap:0.5rem; margin-bottom:0.5rem; align-items:center;">
+                            <input class="med-name" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Medication name">
+                            <input class="med-dose" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Dose (e.g. 500mg)">
+                            <input class="med-freq" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Frequency">
+                            <input class="med-qty" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Quantity">
+                            <button class="btn btn-sm btn-danger" onclick="this.closest('.med-row').remove()" style="padding:0.3rem;">&times;</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-ghost" onclick="addMedRow()" style="margin-top:0.5rem;"><i class="fas fa-plus"></i> Add Medication</button>
                 </div>
 
                 <div id="documentPreview" class="hidden" style="border:1px solid var(--em-border); padding:2rem; background:white; font-family:'Times New Roman', serif; position:relative; min-height:500px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
                     <!-- Header -->
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; padding-bottom:1.5rem; margin-bottom:2rem;">
                         <div style="display:flex; align-items:center; gap:1rem;">
-                            <img src="/WhatsApp Image 2026-06-01 at 15.56.03.jpeg" style="height:80px; object-fit:contain;" alt="Doctors on Wheels Logo">
+                            <div style="width:80px; height:80px; background:var(--em-blue); color:white; display:flex; align-items:center; justify-content:center; border-radius:12px; font-weight:800; font-size:1.5rem;">DoW</div>
                             <div>
                                 <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px;">Doctors on Wheels</h2>
                                 <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
@@ -599,31 +632,125 @@
             document.getElementById('toolsModal').classList.add('hidden');
         }
 
+        async function acceptAppointment(id) {
+            try {
+                notify('Accepting appointment...', 'info');
+                await apiCall('/api/appointments/' + id + '/accept', { method: 'POST' });
+                notify('Appointment accepted', 'success');
+                loadStats();
+            } catch (e) {
+                notify('Failed to accept: ' + e.message, 'error');
+            }
+        }
+
+        // ========== PRESCRIPTION MEDICATION ROWS ==========
+        function addMedRow() {
+            const list = document.getElementById('medList');
+            const row = document.createElement('div');
+            row.className = 'med-row';
+            row.style.cssText = 'display:grid; grid-template-columns:2fr 1fr 1fr 1fr 40px; gap:0.5rem; margin-bottom:0.5rem; align-items:center;';
+            row.innerHTML =
+                '<input class="med-name" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Medication name">' +
+                '<input class="med-dose" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Dose">' +
+                '<input class="med-freq" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Frequency">' +
+                '<input class="med-qty" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Qty">' +
+                '<button class="btn btn-sm btn-danger" onclick="this.closest(\'.med-row\').remove()" style="padding:0.3rem;">&times;</button>';
+            list.appendChild(row);
+        }
+
+        function addDirectMedRow() {
+            const list = document.getElementById('directMedList');
+            const row = document.createElement('div');
+            row.className = 'direct-med-row';
+            row.style.cssText = 'display:grid; grid-template-columns:2fr 1fr 1fr 1fr 40px; gap:0.4rem; margin-bottom:0.4rem; align-items:center;';
+            row.innerHTML =
+                '<input class="dmed-name" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Medication name">' +
+                '<input class="dmed-dose" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Dose">' +
+                '<input class="dmed-freq" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Frequency">' +
+                '<input class="dmed-qty" style="padding:0.4rem; border:1px solid var(--em-border); border-radius:4px; font-size:0.85rem;" placeholder="Qty">' +
+                '<button class="btn btn-sm btn-danger" onclick="this.closest(\'.direct-med-row\').remove()" style="padding:0.2rem 0.4rem;">&times;</button>';
+            list.appendChild(row);
+        }
+
+        function showPrescriptionFields() {
+            document.getElementById('prescriptionFields').classList.remove('hidden');
+        }
+
+        function showDirectPrescriptionFields() {
+            document.getElementById('directPrescriptionFields').classList.remove('hidden');
+        }
+
+        function getMeds(elClass) {
+            const rows = document.querySelectorAll('.' + elClass);
+            const meds = [];
+            rows.forEach(function(r) {
+                const name = r.querySelector('.' + (elClass === 'med-row' ? 'med-name' : 'dmed-name'));
+                const dose = r.querySelector('.' + (elClass === 'med-row' ? 'med-dose' : 'dmed-dose'));
+                const freq = r.querySelector('.' + (elClass === 'med-row' ? 'med-freq' : 'dmed-freq'));
+                const qty = r.querySelector('.' + (elClass === 'med-row' ? 'med-qty' : 'dmed-qty'));
+                if (name && name.value.trim()) {
+                    meds.push({
+                        name: name.value.trim(),
+                        dose: dose ? dose.value.trim() : '',
+                        freq: freq ? freq.value.trim() : '',
+                        qty: qty ? qty.value.trim() : ''
+                    });
+                }
+            });
+            return meds;
+        }
+
+        function generatePrescriptionContent(patientName, today, meds, context) {
+            let content = 'PATIENT: ' + patientName + '\nDATE: ' + today + '\n\nRx\n\n';
+            if (meds.length > 0) {
+                meds.forEach(function(m, i) {
+                    content += (i + 1) + '. ' + m.name;
+                    if (m.dose) content += ' ' + m.dose;
+                    content += '\n';
+                    if (m.freq) content += '   Sig: ' + m.freq;
+                    if (m.qty) content += '   Disp: ' + m.qty;
+                    content += '\n\n';
+                });
+                content += 'Refills: 0\n\n';
+            }
+            if (context) content += 'Notes: ' + context + '\n\n';
+            content += '---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+            return content;
+        }
+
         async function generateDocument(type) {
             const context = document.getElementById('scribeContext').value;
             const appt = currentAppointments.find(a => a.id === activeAppointmentId);
             const patientName = appt ? appt.patient_name : "[Patient Name]";
             
-            // Get doctor profile details for credentials
             const profile = await apiCall('/api/profile/doctor');
             document.getElementById('docSpecialty').textContent = profile.specialty || "Medical Practitioner";
             document.getElementById('docHpcsa').textContent = profile.hpcsa_number || "Verified";
             document.getElementById('docPr').textContent = profile.practice_number || "Registered";
+            document.getElementById('docHeaderName').textContent = profile.name || '';
+            document.getElementById('docSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
             
-            notify(`Generating ${type}...`, 'info');
+            notify('Generating ' + type + '...', 'info');
             
-            let content = "";
+            let content = '';
             const today = new Date().toLocaleDateString('en-ZA');
             document.getElementById('docTitle').textContent = type;
+            document.getElementById('docDate').textContent = today;
 
             if (type === 'Sick Note') {
-                content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ${context}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                const days = prompt('Number of sick leave days?', '2');
+                const d = parseInt(days) || 2;
+                const unfitEnd = new Date(Date.now() + d * 86400000).toLocaleDateString('en-ZA');
+                const fitDate = new Date(Date.now() + (d + 1) * 86400000).toLocaleDateString('en-ZA');
+                content = 'TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ' + patientName + ' on ' + today + '.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ' + today + ' to ' + unfitEnd + ' inclusive.\n\nThe patient is expected to be fit to resume duties on ' + fitDate + '.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ' + (context || 'Not specified') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
             } else if (type === 'Prescription') {
-                content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n1. Medication A (e.g. Amoxicillin 500mg)\n   Sig: 1 tab PO TID x 5 days\n   Mitte: 15 tabs\n\n2. Medication B (e.g. Paracetamol 500mg)\n   Sig: 2 tabs PO QID PRN for pain\n   Mitte: 20 tabs\n\nRefills: 0\n\nNotes: ${context}\n\n---
-Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                const meds = getMeds('med-row');
+                content = generatePrescriptionContent(patientName, today, meds, context);
             } else if (type === 'Referral Letter') {
-                content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n- Patient presented with symptoms as described in the consultation.\n- Initial assessment suggests specialized intervention may be required.\n\nContext & Notes: ${context}\n\nThank you for your assistance in the ongoing care of this patient.\n\n---
-Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                content = 'RE: REFERRAL FOR ' + patientName.toUpperCase() + '\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n' + (context || 'The patient presented with symptoms requiring specialist evaluation.') + '\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+            } else if (type === 'Clinical Note') {
+                const noteTitle = prompt('Note title (e.g. SOAP Note, Progress Note):', 'Clinical Note');
+                content = (noteTitle || 'Clinical Note') + '\n\nDate: ' + today + '\nPatient: ' + patientName + '\n\n' + (context || 'No clinical details provided.') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
             }
 
             document.getElementById('documentContent').textContent = content;
@@ -643,19 +770,27 @@ Practice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
                 document.getElementById('directDocHeaderName').textContent = profile.name || '';
                 document.getElementById('directDocSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
                 
-                notify(`Generating ${type}...`, 'info');
+                notify('Generating ' + type + '...', 'info');
                 
-                let content = "";
+                let content = '';
                 const today = new Date().toLocaleDateString('en-ZA');
                 document.getElementById('directDocTitle').textContent = type;
                 document.getElementById('directDocDate').textContent = today;
 
                 if (type === 'Sick Note') {
-                    content = `TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ${patientName} on ${today}.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ${today} to ${new Date(Date.now() + 172800000).toLocaleDateString('en-ZA')} inclusive.\n\nThe patient is expected to be fit to resume duties on ${new Date(Date.now() + 259200000).toLocaleDateString('en-ZA')}.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context:\n${context || 'No additional context provided.'}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                    const days = prompt('Number of sick leave days?', '2');
+                    const d = parseInt(days) || 2;
+                    const unfitEnd = new Date(Date.now() + d * 86400000).toLocaleDateString('en-ZA');
+                    const fitDate = new Date(Date.now() + (d + 1) * 86400000).toLocaleDateString('en-ZA');
+                    content = 'TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ' + patientName + ' on ' + today + '.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ' + today + ' to ' + unfitEnd + ' inclusive.\n\nThe patient is expected to be fit to resume duties on ' + fitDate + '.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context:\n' + (context || 'Not specified.') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
                 } else if (type === 'Prescription') {
-                    content = `PATIENT: ${patientName}\nDATE: ${today}\n\nRx\n\n${context || 'No medications specified. Please use the Clinical Details field to list medications, dosages, and instructions.'}\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                    const meds = getMeds('direct-med-row');
+                    content = generatePrescriptionContent(patientName, today, meds, context);
                 } else if (type === 'Referral Letter') {
-                    content = `RE: REFERRAL FOR ${patientName.toUpperCase()}\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n${context || 'No clinical context provided. Please use the Clinical Details field to describe the patient condition and reason for referral.'}\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com`;
+                    content = 'RE: REFERRAL FOR ' + patientName.toUpperCase() + '\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n' + (context || 'The patient presented with symptoms requiring specialist evaluation.') + '\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                } else if (type === 'Clinical Note') {
+                    const noteTitle = prompt('Note title (e.g. SOAP Note, Progress Note):', 'Clinical Note');
+                    content = (noteTitle || 'Clinical Note') + '\n\nDate: ' + today + '\nPatient: ' + patientName + '\n\n' + (context || 'No clinical details provided.') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
                 }
 
                 document.getElementById('directDocumentContent').textContent = content;
