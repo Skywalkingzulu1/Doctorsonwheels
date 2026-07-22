@@ -12,98 +12,667 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctors on Wheels - Healthcare on Demand</title>
+    <title>Doctors on Wheels — Healthcare, On Your Terms</title>
+    <meta name="description" content="South Africa's on-demand healthcare platform. Connect with verified doctors via video, chat, or home visits.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        :root{--primary:#0052cc;--primary-dark:#0747a6;--secondary:#00a3bf;--accent:#36b37e;--light:#f4f5f7;--white:#fff;--text:#172b4d}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,var(--primary-dark),var(--primary));min-height:100vh;color:var(--text)}
-        .hero{min-height:60vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:2rem}
-        .hero h1{font-size:3rem;color:var(--white);margin-bottom:1rem}
-        .hero h1 span{color:#4fc3f7}
-        .hero p{font-size:1.2rem;color:#b0bec5;max-width:600px;margin:0 auto 2rem}
-        .portal-cards{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
-        .portal-card{background:var(--white);padding:2rem;border-radius:16px;width:280px;text-align:center;transition:all 0.3s;cursor:pointer;text-decoration:none;color:var(--text);box-shadow:0 4px 20px rgba(0,0,0,0.2)}
-        .portal-card:hover{transform:translateY(-8px);box-shadow:0 12px 40px rgba(0,0,0,0.3)}
-        .portal-card i{font-size:3rem;margin-bottom:1rem}
-        .portal-card.patient i{color:var(--primary)}
-        .portal-card.doctor i{color:var(--accent)}
-        .portal-card h3{margin-bottom:0.5rem}
-        .portal-card p{font-size:0.9rem;color:#6b778c}
-        .features-section{padding:4rem 2rem;max-width:1100px;margin:0 auto}
-        .features-section h2{text-align:center;color:var(--white);font-size:2rem;margin-bottom:3rem}
-        .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem}
-        .feature-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:2rem;color:var(--white);transition:all 0.3s}
-        .feature-card:hover{background:rgba(255,255,255,0.12);transform:translateY(-4px)}
-        .feature-card i{font-size:2.2rem;color:#4fc3f7;margin-bottom:1rem}
-        .feature-card h3{margin-bottom:0.5rem;font-size:1.2rem}
-        .feature-card p{font-size:0.9rem;color:#b0bec5;line-height:1.6}
-        .footer{text-align:center;padding:2rem;color:#6b778c;font-size:0.85rem}
-        @media(max-width:768px){.hero h1{font-size:2rem}.portal-cards{flex-direction:column;align-items:center}}
+        :root {
+            --primary: #0052cc;
+            --primary-dark: #0747a6;
+            --primary-darker: #052d6e;
+            --secondary: #00a3bf;
+            --accent: #36b37e;
+            --accent-dark: #2a8f63;
+            --white: #ffffff;
+            --light: #f8fafc;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --glass-bg: rgba(255,255,255,0.08);
+            --glass-border: rgba(255,255,255,0.15);
+            --glass-bg-solid: rgba(255,255,255,0.95);
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+            --shadow-glow: 0 0 30px rgba(0,82,204,0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); line-height: 1.6; overflow-x: hidden; }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+        .navbar.scrolled {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .navbar.scrolled .nav-logo, .navbar.scrolled .nav-link { color: var(--text); }
+        .nav-logo {
+            font-size: 1.3rem; font-weight: 800; color: var(--white);
+            text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
+            letter-spacing: -0.5px; transition: color 0.3s;
+        }
+        .nav-logo i { font-size: 1.5rem; }
+        .nav-links { display: flex; align-items: center; gap: 2rem; }
+        .nav-link {
+            color: rgba(255,255,255,0.85); text-decoration: none; font-weight: 500;
+            font-size: 0.9rem; transition: color 0.2s; letter-spacing: 0.01em;
+        }
+        .nav-link:hover { color: var(--white); }
+        .navbar.scrolled .nav-link:hover { color: var(--primary); }
+        .nav-btns { display: flex; gap: 0.75rem; align-items: center; }
+        .btn {
+            padding: 0.6rem 1.4rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem;
+            cursor: pointer; transition: all 0.25s ease; text-decoration: none; border: none;
+            display: inline-flex; align-items: center; gap: 0.5rem; letter-spacing: 0.01em;
+        }
+        .btn-ghost-nav {
+            background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-ghost-nav:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+        .navbar.scrolled .btn-ghost-nav { color: var(--primary); border-color: var(--primary); background: transparent; }
+        .navbar.scrolled .btn-ghost-nav:hover { background: var(--primary); color: var(--white); }
+        .btn-primary-nav { background: var(--white); color: var(--primary); font-weight: 700; }
+        .btn-primary-nav:hover { background: #f0f4ff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .navbar.scrolled .btn-primary-nav { background: var(--primary); color: var(--white); }
+        .navbar.scrolled .btn-primary-nav:hover { background: var(--primary-dark); }
+        .hamburger { display: none; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+        .navbar.scrolled .hamburger { color: var(--text); }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative; min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-darker) 0%, var(--primary-dark) 40%, var(--primary) 100%);
+            display: flex; align-items: center; justify-content: center;
+            padding: 8rem 2rem 5rem; overflow: hidden;
+        }
+        .hero-blob {
+            position: absolute; width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,163,191,0.25) 0%, transparent 70%);
+            top: -100px; right: -150px;
+            animation: blobFloat 15s ease-in-out infinite;
+        }
+        .hero-blob-2 {
+            position: absolute; width: 400px; height: 400px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(54,179,126,0.15) 0%, transparent 70%);
+            bottom: -50px; left: -100px;
+            animation: blobFloat 20s ease-in-out infinite reverse;
+        }
+        @keyframes blobFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+        .hero-grid {
+            position: absolute; inset: 0;
+            background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 800px; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            background: rgba(54,179,126,0.15); border: 1px solid rgba(54,179,126,0.3);
+            color: #5ce0a0; padding: 0.4rem 1rem; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600; margin-bottom: 1.5rem;
+            animation: fadeInUp 0.8s ease both;
+        }
+        .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #5ce0a0; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .hero h1 {
+            font-size: clamp(2.5rem, 5.5vw, 4.2rem); font-weight: 900;
+            color: var(--white); line-height: 1.1; margin-bottom: 1.25rem;
+            letter-spacing: -1.5px; animation: fadeInUp 0.8s ease 0.15s both;
+        }
+        .hero h1 .gradient-text {
+            background: linear-gradient(135deg, #4fc3f7, #5ce0a0);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-sub {
+            font-size: clamp(1rem, 2vw, 1.25rem); color: rgba(255,255,255,0.7);
+            max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.7;
+            animation: fadeInUp 0.8s ease 0.3s both;
+        }
+        .hero-actions {
+            display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.45s both;
+        }
+        .btn-hero-primary {
+            background: var(--white); color: var(--primary); padding: 0.9rem 2rem;
+            border-radius: 12px; font-size: 1rem; font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+        .btn-hero-secondary {
+            background: rgba(255,255,255,0.1); color: var(--white); padding: 0.9rem 2rem;
+            border-radius: 12px; font-size: 1rem; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-hero-secondary:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+        .hero-trust {
+            display: flex; align-items: center; justify-content: center; gap: 2rem;
+            margin-top: 3.5rem; animation: fadeInUp 0.8s ease 0.6s both;
+        }
+        .hero-trust-item { display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.5); font-size: 0.8rem; }
+        .hero-trust-item i { color: rgba(54,179,126,0.7); }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== STATS ===== */
+        .stats-section {
+            position: relative; margin-top: -3rem; z-index: 10;
+            padding: 0 2rem;
+        }
+        .stats-container {
+            max-width: 1000px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem;
+        }
+        .stat-card {
+            background: var(--glass-bg-solid);
+            border-radius: 16px; padding: 2rem 1.5rem; text-align: center;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg), var(--shadow-glow); }
+        .stat-icon {
+            width: 48px; height: 48px; border-radius: 12px; margin: 0 auto 1rem;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        .stat-icon.blue { background: #eef4ff; color: var(--primary); }
+        .stat-icon.green { background: #e3fcef; color: var(--accent); }
+        .stat-icon.teal { background: #e6fcff; color: var(--secondary); }
+        .stat-icon.amber { background: #fff8e1; color: #f59e0b; }
+        .stat-value {
+            font-size: 2.5rem; font-weight: 900; color: var(--text);
+            line-height: 1; margin-bottom: 0.25rem; letter-spacing: -1px;
+        }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* ===== SECTIONS SHARED ===== */
+        .section { padding: 5rem 2rem; }
+        .section-header { text-align: center; margin-bottom: 3.5rem; }
+        .section-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: #eef4ff; color: var(--primary); padding: 0.35rem 0.9rem;
+            border-radius: 50px; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800;
+            color: var(--text); letter-spacing: -0.75px; margin-bottom: 0.75rem;
+        }
+        .section-subtitle { font-size: 1.05rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+        /* ===== FEATURES ===== */
+        .features-section { background: var(--light); }
+        .features-grid {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        }
+        .feature-card {
+            background: var(--white); border-radius: 16px; padding: 2rem;
+            border: 1px solid var(--border); transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 56px; height: 56px; border-radius: 14px; margin-bottom: 1.25rem;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+        }
+        .feature-icon.blue { background: #eef4ff; color: var(--primary); }
+        .feature-icon.green { background: #e3fcef; color: var(--accent); }
+        .feature-icon.teal { background: #e6fcff; color: var(--secondary); }
+        .feature-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .feature-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-section { background: var(--white); }
+        .how-grid {
+            max-width: 900px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; position: relative;
+        }
+        .how-grid::before {
+            content: ''; position: absolute; top: 36px; left: 12.5%; right: 12.5%;
+            height: 2px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            z-index: 0;
+        }
+        .how-step { text-align: center; position: relative; z-index: 1; }
+        .how-number {
+            width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 1.25rem;
+            background: var(--white); border: 3px solid var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 800; color: var(--primary);
+            box-shadow: 0 4px 16px rgba(0,82,204,0.12);
+        }
+        .how-step.active .how-number { background: var(--primary); color: var(--white); }
+        .how-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
+        .how-step p { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* ===== COFOUNDERS ===== */
+        .team-section { background: var(--light); }
+        .team-grid {
+            max-width: 700px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem;
+        }
+        .team-card {
+            background: var(--white); border-radius: 20px; padding: 2.5rem 2rem;
+            text-align: center; border: 1px solid var(--border);
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .team-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+        .team-avatar {
+            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1.25rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; font-weight: 800; color: var(--white);
+        }
+        .team-avatar.blue { background: linear-gradient(135deg, var(--primary), var(--secondary)); }
+        .team-avatar.green { background: linear-gradient(135deg, var(--accent), #2ecc71); }
+        .team-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .team-role {
+            font-size: 0.85rem; color: var(--primary); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem;
+        }
+        .team-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* ===== CTA ===== */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-darker) 0%, var(--primary-dark) 50%, var(--primary) 100%);
+            padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden;
+        }
+        .cta-section::before {
+            content: ''; position: absolute; width: 500px; height: 500px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(54,179,126,0.12) 0%, transparent 70%);
+            top: -200px; right: -100px;
+        }
+        .cta-content { position: relative; z-index: 2; }
+        .cta-section h2 {
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 800;
+            color: var(--white); margin-bottom: 1rem; letter-spacing: -0.5px;
+        }
+        .cta-section p { color: rgba(255,255,255,0.7); font-size: 1.1rem; margin-bottom: 2.5rem; }
+        .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+        .btn-cta-primary {
+            background: var(--white); color: var(--primary); padding: 0.9rem 2.5rem;
+            border-radius: 12px; font-size: 1rem; font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        .btn-cta-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+        .btn-cta-secondary {
+            background: rgba(255,255,255,0.1); color: var(--white); padding: 0.9rem 2.5rem;
+            border-radius: 12px; font-size: 1rem; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.25);
+        }
+        .btn-cta-secondary:hover { background: rgba(255,255,255,0.15); }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: #0f172a; padding: 3rem 2rem 2rem; color: rgba(255,255,255,0.5);
+        }
+        .footer-inner {
+            max-width: 1100px; margin: 0 auto;
+            display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 2rem;
+        }
+        .footer-brand h3 { color: var(--white); font-size: 1.2rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        .footer-brand p { font-size: 0.85rem; line-height: 1.6; }
+        .footer-col h4 { color: var(--white); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+        .footer-col a { display: block; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.85rem; padding: 0.25rem 0; transition: color 0.2s; }
+        .footer-col a:hover { color: var(--white); }
+        .footer-social { display: flex; gap: 1rem; margin-top: 1rem; }
+        .footer-social a {
+            width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .footer-social a:hover { background: var(--primary); color: var(--white); }
+        .footer-bottom {
+            max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem;
+        }
+
+        /* ===== REVEAL ANIMATION ===== */
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .nav-links, .nav-btns { display: none; }
+            .hamburger { display: block; }
+            .mobile-menu {
+                display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.98);
+                backdrop-filter: blur(20px); z-index: 999; padding: 5rem 2rem 2rem;
+                flex-direction: column; gap: 1rem;
+            }
+            .mobile-menu.open { display: flex; }
+            .mobile-menu a {
+                font-size: 1.2rem; font-weight: 600; color: var(--text);
+                text-decoration: none; padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+            }
+            .mobile-menu .close-btn {
+                position: absolute; top: 1.5rem; right: 1.5rem; background: none;
+                border: none; font-size: 1.5rem; color: var(--text); cursor: pointer;
+            }
+            .stats-container { grid-template-columns: repeat(2, 1fr); }
+            .features-grid { grid-template-columns: 1fr; }
+            .how-grid { grid-template-columns: repeat(2, 1fr); }
+            .how-grid::before { display: none; }
+            .team-grid { grid-template-columns: 1fr; max-width: 400px; }
+            .footer-inner { grid-template-columns: 1fr; }
+            .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+        }
+        @media (max-width: 480px) {
+            .stats-container { grid-template-columns: 1fr; }
+            .hero-actions { flex-direction: column; align-items: center; }
+            .hero-actions .btn { width: 100%; max-width: 280px; justify-content: center; }
+        }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <div>
-            <h1>Doctors on <span>Wheels</span></h1>
-            <p>South Africa's on-demand healthcare platform.<br>Connect with trusted doctors from anywhere.</p>
-            <div class="portal-cards">
-                <a href="index.html" class="portal-card patient">
-                    <i class="fas fa-user-injured"></i>
-                    <h3>Patient Portal</h3>
-                    <p>Find doctors, book appointments, video consultations, and home visits</p>
-                </a>
-                <a href="doctor_dashboard.html" class="portal-card doctor">
-                    <i class="fas fa-user-md"></i>
-                    <h3>Doctor Portal</h3>
-                    <p>Manage patients, set your rates, consult via video or in-person visits</p>
-                </a>
-            </div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <a href="landing.html" class="nav-logo"><i class="fas fa-notes-medical"></i> Doctors on Wheels</a>
+    <div class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#how" class="nav-link">How It Works</a>
+        <a href="#team" class="nav-link">Team</a>
+    </div>
+    <div class="nav-btns">
+        <a href="login.html" class="btn btn-ghost-nav">Log In</a>
+        <a href="register.html" class="btn btn-primary-nav">Sign Up Free</a>
+    </div>
+    <button class="hamburger" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+    <button class="close-btn" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
+    <a href="#features" onclick="toggleMobileMenu()">Features</a>
+    <a href="#how" onclick="toggleMobileMenu()">How It Works</a>
+    <a href="#team" onclick="toggleMobileMenu()">Team</a>
+    <a href="login.html">Log In</a>
+    <a href="register.html">Sign Up Free</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-blob"></div>
+    <div class="hero-blob-2"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="dot"></span> Available across South Africa
+        </div>
+        <h1>Healthcare,<br><span class="gradient-text">On Your Terms</span></h1>
+        <p class="hero-sub">Connect with verified doctors instantly — via secure video, chat, or in-person home visits. No waiting rooms. No travel. Just care.</p>
+        <div class="hero-actions">
+            <a href="index.html" class="btn btn-hero-primary"><i class="fas fa-user-md"></i> Find a Doctor</a>
+            <a href="register.html" class="btn btn-hero-secondary"><i class="fas fa-stethoscope"></i> Join as a Doctor</a>
+        </div>
+        <div class="hero-trust">
+            <div class="hero-trust-item"><i class="fas fa-shield-halved"></i> HPCSA Verified</div>
+            <div class="hero-trust-item"><i class="fas fa-lock"></i> Secure &amp; Private</div>
+            <div class="hero-trust-item"><i class="fas fa-bolt"></i> Instant Booking</div>
         </div>
     </div>
+</section>
 
-    <div class="features-section">
-        <h2>Why Doctors on Wheels?</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <i class="fas fa-video"></i>
-                <h3>Video Consultations</h3>
-                <p>Connect with doctors from the comfort of your home via secure video calls. No waiting rooms, no travel.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-home"></i>
-                <h3>Home Visits</h3>
-                <p>Need a doctor to come to you? Book a home visit and a qualified practitioner will arrive at your doorstep.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-stethoscope"></i>
-                <h3>Verified Doctors</h3>
-                <p>All practitioners are HPCSA-registered and verified. Your health and safety are our top priority.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-credit-card"></i>
-                <h3>Secure Payments</h3>
-                <p>Pay securely via Yoco credit/debit card or use your wallet balance. Transparent pricing with no hidden fees.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-file-prescription"></i>
-                <h3>Digital Prescriptions</h3>
-                <p>Receive electronic prescriptions after your consultation. Sent directly to your preferred pharmacy.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-globe-africa"></i>
-                <h3>Built for South Africa</h3>
-                <p>HPCSA verification, gig economy pricing, and local healthcare workflows — designed for SA doctors and patients.</p>
-            </div>
+<!-- STATS -->
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stat-card reveal">
+            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+            <div class="stat-value" data-target="15">0</div>
+            <div class="stat-label">Patients Served</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-1">
+            <div class="stat-icon green"><i class="fas fa-user-doctor"></i></div>
+            <div class="stat-value" data-target="2">0</div>
+            <div class="stat-label">Verified Doctors</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-2">
+            <div class="stat-icon teal"><i class="fas fa-clipboard-check"></i></div>
+            <div class="stat-value" data-target="25">0</div>
+            <div class="stat-label">Consultations Done</div>
+        </div>
+        <div class="stat-card reveal reveal-delay-3">
+            <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+            <div class="stat-value" data-target="24" data-suffix="/7">0</div>
+            <div class="stat-label">Always Available</div>
         </div>
     </div>
+</section>
 
-    <div class="footer">
-        Doctors on Wheels &mdash; Healthcare on Demand
+<!-- FEATURES -->
+<section class="section features-section" id="features">
+    <div class="section-header">
+        <div class="section-badge"><i class="fas fa-star"></i> Why Choose Us</div>
+        <h2 class="section-title">Everything You Need, In One Place</h2>
+        <p class="section-subtitle">From video consultations to digital prescriptions — built for the way South Africa lives and works.</p>
     </div>
+    <div class="features-grid">
+        <div class="feature-card reveal">
+            <div class="feature-icon blue"><i class="fas fa-video"></i></div>
+            <h3>Video Consultations</h3>
+            <p>Connect face-to-face with doctors from the comfort of your home. Secure, private, and HD quality.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+            <div class="feature-icon green"><i class="fas fa-house-medical"></i></div>
+            <h3>Home Visits</h3>
+            <p>Need a doctor to come to you? Book a home visit and a qualified practitioner arrives at your door.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+            <div class="feature-icon teal"><i class="fas fa-user-shield"></i></div>
+            <h3>Verified Doctors</h3>
+            <p>Every practitioner is HPCSA-registered and manually verified. Your safety is non-negotiable.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon blue"><i class="fas fa-file-prescription"></i></div>
+            <h3>Digital Prescriptions</h3>
+            <p>Get e-prescriptions sent directly to your preferred pharmacy after every consultation.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+            <div class="feature-icon green"><i class="fas fa-credit-card"></i></div>
+            <h3>Secure Payments</h3>
+            <p>Pay with credit/debit card via Yoco, or use your in-app wallet. Transparent pricing, no hidden fees.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+            <div class="feature-icon teal"><i class="fas fa-globe-africa"></i></div>
+            <h3>Built for South Africa</h3>
+            <p>HPCSA workflows, gig-economy doctor pricing, and local healthcare infrastructure — designed from the ground up.</p>
+        </div>
+    </div>
+</section>
 
-    <script>
-        localStorage.removeItem('token');
-    </script>
+<!-- HOW IT WORKS -->
+<section class="section how-section" id="how">
+    <div class="section-header">
+        <div class="section-badge"><i class="fas fa-route"></i> Simple Process</div>
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Four simple steps from signup to treatment. No paperwork. No queues.</p>
+    </div>
+    <div class="how-grid">
+        <div class="how-step reveal">
+            <div class="how-number">1</div>
+            <h4>Create Account</h4>
+            <p>Sign up in under 30 seconds as a patient or doctor.</p>
+        </div>
+        <div class="how-step reveal reveal-delay-1">
+            <div class="how-number active">2</div>
+            <h4>Choose a Doctor</h4>
+            <p>Browse verified profiles, specialties, and real-time availability.</p>
+        </div>
+        <div class="how-step reveal reveal-delay-2">
+            <div class="how-number">3</div>
+            <h4>Consult</h4>
+            <p>Connect via secure video, chat, or book an in-person home visit.</p>
+        </div>
+        <div class="how-step reveal reveal-delay-3">
+            <div class="how-number">4</div>
+            <h4>Get Treatment</h4>
+            <p>Receive prescriptions, referrals, and sick notes — all digitally.</p>
+        </div>
+    </div>
+</section>
+
+<!-- COFOUNDERS -->
+<section class="section team-section" id="team">
+    <div class="section-header">
+        <div class="section-badge"><i class="fas fa-users"></i> Our Team</div>
+        <h2 class="section-title">Meet the Founders</h2>
+        <p class="section-subtitle">A doctor and an engineer building the future of South African healthcare.</p>
+    </div>
+    <div class="team-grid">
+        <div class="team-card reveal">
+            <div class="team-avatar blue">SL</div>
+            <h3>Dr Sam Luzulane</h3>
+            <div class="team-role">Co-Founder &amp; Medical Director</div>
+            <p>Practicing medical doctor passionate about making healthcare accessible to every South African, regardless of location.</p>
+        </div>
+        <div class="team-card reveal reveal-delay-1">
+            <div class="team-avatar green">AM</div>
+            <h3>Andile S. Mchunu</h3>
+            <div class="team-role">Co-Founder &amp; Technology Lead</div>
+            <p>Building the systems that connect patients with care. Full-stack engineer focused on reliability and scale.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>Ready to Experience Healthcare Differently?</h2>
+        <p>Join thousands of South Africans already using Doctors on Wheels.</p>
+        <div class="cta-actions">
+            <a href="register.html" class="btn btn-cta-primary"><i class="fas fa-rocket"></i> Get Started Free</a>
+            <a href="login.html" class="btn btn-cta-secondary"><i class="fas fa-arrow-right-to-bracket"></i> I Have an Account</a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3><i class="fas fa-notes-medical" style="color:var(--secondary)"></i> Doctors on Wheels</h3>
+            <p>South Africa's on-demand healthcare platform. Connecting patients with verified doctors via video, chat, and home visits.</p>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Platform</h4>
+            <a href="index.html">Find a Doctor</a>
+            <a href="doctor_dashboard.html">Doctor Portal</a>
+            <a href="about.html">About Us</a>
+        </div>
+        <div class="footer-col">
+            <h4>Account</h4>
+            <a href="login.html">Log In</a>
+            <a href="register.html">Sign Up</a>
+            <a href="#">Help Centre</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">HPCSA Compliance</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2026 Doctors on Wheels. All rights reserved.</span>
+        <span>Made with care in South Africa</span>
+    </div>
+</footer>
+
+<script>
+// ===== NAVBAR SCROLL =====
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// ===== MOBILE MENU =====
+function toggleMobileMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ===== SCROLL REVEAL =====
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// ===== ANIMATED COUNTERS =====
+const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const el = entry.target;
+            const target = parseInt(el.getAttribute('data-target'));
+            const suffix = el.getAttribute('data-suffix') || '+';
+            const duration = 1500;
+            const start = performance.now();
+
+            function update(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(target * eased);
+                el.textContent = current + (progress >= 1 ? suffix : '');
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+            counterObserver.unobserve(el);
+        }
+    });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('.stat-value[data-target]').forEach(el => counterObserver.observe(el));
+
+// ===== SMOOTH SCROLL FOR ANCHOR LINKS =====
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+</script>
+
 </body>
 </html>
