@@ -45,17 +45,21 @@
         /* ===== NAVBAR ===== */
         .navbar {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            padding: 1rem 2rem;
-            display: flex; align-items: center; justify-content: space-between;
             transition: all 0.3s ease;
+        }
+        .nav-container {
+            max-width: 1100px; margin: 0 auto; padding: 1rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
         }
         .navbar.scrolled {
             background: rgba(255,255,255,0.92);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 2rem;
             box-shadow: var(--shadow-sm);
+        }
+        .navbar.scrolled .nav-container {
+            padding: 0.75rem 2rem;
         }
         .navbar.scrolled .nav-logo, .navbar.scrolled .nav-link { color: var(--text); }
         .nav-logo {
@@ -365,9 +369,10 @@
         @media (max-width: 768px) {
             .nav-links, .nav-btns { display: none; }
             .hamburger { display: block; }
+            .nav-container { padding: 0.75rem 1.25rem; }
             .mobile-menu {
                 display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.98);
-                backdrop-filter: blur(20px); z-index: 999; padding: 5rem 2rem 2rem;
+                backdrop-filter: blur(20px); z-index: 1001; padding: 5rem 2rem 2rem;
                 flex-direction: column; gap: 1rem;
             }
             .mobile-menu.open { display: flex; }
@@ -398,17 +403,19 @@
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
-    <a href="landing.html" class="nav-logo"><i class="fas fa-notes-medical"></i> Doctors on Wheels</a>
-    <div class="nav-links">
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#how" class="nav-link">How It Works</a>
-        <a href="#team" class="nav-link">Team</a>
+    <div class="nav-container">
+        <a href="landing.html" class="nav-logo"><i class="fas fa-notes-medical"></i> Doctors on Wheels</a>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how" class="nav-link">How It Works</a>
+            <a href="#team" class="nav-link">Team</a>
+        </div>
+        <div class="nav-btns">
+            <a href="login.html" class="btn btn-ghost-nav">Log In</a>
+            <a href="register.html" class="btn btn-primary-nav">Sign Up Free</a>
+        </div>
+        <button class="hamburger" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
     </div>
-    <div class="nav-btns">
-        <a href="login.html" class="btn btn-ghost-nav">Log In</a>
-        <a href="register.html" class="btn btn-primary-nav">Sign Up Free</a>
-    </div>
-    <button class="hamburger" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
 </nav>
 
 <!-- MOBILE MENU -->
@@ -607,10 +614,11 @@
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">HPCSA Compliance</a>
+            <a href="#">PCNS: 1339370</a>
         </div>
     </div>
     <div class="footer-bottom">
-        <span>&copy; 2026 Doctors on Wheels. All rights reserved.</span>
+        <span>&copy; 2026 Doctors on Wheels. All rights reserved. PCNS: 1339370</span>
         <span>Made with care in South Africa</span>
     </div>
 </footer>
