@@ -502,7 +502,7 @@
             if (!authToken) { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'login.html'; return; }
             try {
                 const user = await apiCall('/api/auth/me');
-                if (user.role !== 'DOCTOR') { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'index.html'; return; }
+                if (user.role !== 'DOCTOR') { document.getElementById('splashScreen').classList.add('hidden'); window.location.href = 'login.html'; return; }
                 document.getElementById('displayDocName').textContent = user.name;
                 document.getElementById('splashScreen').classList.add('hidden');
                 await loadProfile();

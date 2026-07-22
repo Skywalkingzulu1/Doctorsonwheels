@@ -392,7 +392,7 @@
             } catch(e) {
                 alert('Session expired. Please login again.');
                 localStorage.removeItem('token');
-                window.parent.location.href = 'index.html';
+                window.parent.location.href = 'patient_dashboard.html';
                 return false;
             }
         }
@@ -706,7 +706,7 @@
                 if (currentUser.role === 'DOCTOR') {
                     window.location.href = 'doctor_dashboard.html';
                 } else {
-                    window.location.href = 'index.html';
+                    window.location.href = 'patient_dashboard.html';
                 }
             }
         }

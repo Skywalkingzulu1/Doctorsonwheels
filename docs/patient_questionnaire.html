@@ -181,7 +181,7 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const appointmentId = urlParams.get('appointment_id');
-        const returnUrl = urlParams.get('return') || 'index.html';
+        const returnUrl = urlParams.get('return') || 'patient_dashboard.html';
         const authToken = localStorage.getItem('token');
         const SESSION_KEY = 'dow_questionnaire_draft';
         const SESSION_FORM_KEY = 'dow_questionnaire_form';
