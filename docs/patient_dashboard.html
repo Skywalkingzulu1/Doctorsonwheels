@@ -869,5 +869,22 @@
         location.reload();
     }
     </script>
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Doctors on Wheels">
+    <meta name="theme-color" content="#0052cc">
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').then((reg) => {
+                console.log('[PWA] SW registered:', reg.scope);
+            }).catch((err) => {
+                console.error('[PWA] SW registration failed:', err);
+            });
+        });
+    }
+    </script>
 </body>
 </html>

@@ -1,85 +1,69 @@
-// Doctors on Wheels PWA Service Worker
-const CACHE_NAME = 'doctorlink-v1';
-const ASSETS_TO_CACHE = [
-    '/static/index.html',
-    '/static/room.html',
-    '/static/manifest.json',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+const CACHE_NAME = 'dow-v2';
+const STATIC_ASSETS = [
+    '/',
+    '/index.html',
+    '/manifest.json',
+    '/icon-192.png',
+    '/icon-512.png',
+    '/icon-192-maskable.png',
+    '/icon-512-maskable.png'
 ];
 
-// Install event - cache assets
 self.addEventListener('install', (event) => {
-    console.log('[SW] Installing service worker...');
     event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => {
-                console.log('[SW] Caching app assets');
-                return cache.addAll(ASSETS_TO_CACHE);
-            })
-            .then(() => self.skipWaiting())
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(STATIC_ASSETS).catch(() => {});
+        }).then(() => self.skipWaiting())
     );
 });
 
-// Activate event - clean old caches
 self.addEventListener('activate', (event) => {
-    console.log('[SW] Activating service worker...');
     event.waitUntil(
-        caches.keys().then((cacheNames) => {
-            return Promise.all(
-                cacheNames
-                    .filter((name) => name !== CACHE_NAME)
-                    .map((name) => {
-                        console.log('[SW] Deleting old cache:', name);
-                        return caches.delete(name);
-                    })
-            );
+        caches.keys().then((keys) => {
+            return Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)));
         }).then(() => self.clients.claim())
     );
 });
 
-// Fetch event - serve from cache, fallback to network
 self.addEventListener('fetch', (event) => {
-    // Skip non-GET requests
     if (event.request.method !== 'GET') return;
-    
-    // Skip API calls (let them go to network)
-    if (event.request.url.includes('/api/')) return;
-    
+    const url = new URL(event.request.url);
+
+    // API calls always go to network
+    if (url.pathname.startsWith('/api/')) {
+        event.respondWith(fetch(event.request).catch(() => new Response(JSON.stringify({ error: 'offline' }), { status: 503 })));
+        return;
+    }
+
+    // Static assets: cache-first
+    if (url.pathname.match(/\.(png|jpg|jpeg|gif|svg|css|js|woff2?)$/)) {
+        event.respondWith(
+            caches.match(event.request).then((cached) => cached || fetch(event.request).then((res) => {
+                const clone = res.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+                return res;
+            }))
+        );
+        return;
+    }
+
+    // Pages: network-first with cache fallback
     event.respondWith(
-        caches.match(event.request)
-            .then((cachedResponse) => {
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-                
-                return fetch(event.request)
-                    .then((networkResponse) => {
-                        // Cache successful responses
-                        if (networkResponse && networkResponse.status === 200) {
-                            const responseClone = networkResponse.clone();
-                            caches.open(CACHE_NAME)
-                                .then((cache) => {
-                                    cache.put(event.request, responseClone);
-                                });
-                        }
-                        return networkResponse;
-                    })
-                    .catch(() => {
-                        // Return offline page for navigation requests
-                        if (event.request.mode === 'navigate') {
-                            return caches.match('/static/index.html');
-                        }
-                        return null;
-                    });
-            })
+        fetch(event.request).then((res) => {
+            if (res.status === 200) {
+                const clone = res.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+            }
+            return res;
+        }).catch(() => {
+            return caches.match(event.request).then((cached) => {
+                if (cached) return cached;
+                return caches.match('/');
+            });
+        })
     );
 });
 
-// Handle messages from the app
 self.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'SKIP_WAITING') {
-        self.skipWaiting();
-    }
+    if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
-
-console.log('[SW] Service worker loaded');

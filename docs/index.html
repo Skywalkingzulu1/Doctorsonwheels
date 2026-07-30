@@ -15,6 +15,11 @@
     <title>Doctors on Wheels — Healthcare, On Your Terms</title>
     <meta name="description" content="South Africa's on-demand healthcare platform. Connect with verified doctors via video, chat, or home visits.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Doctors on Wheels">
+    <meta name="theme-color" content="#0052cc">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -611,10 +616,10 @@
         </div>
         <div class="footer-col">
             <h4>Legal</h4>
-            <a href="#">Privacy Policy</a>
+            <a href="privacy.html">Privacy Policy</a>
             <a href="#">Terms of Service</a>
             <a href="#">HPCSA Compliance</a>
-            <a href="#">PCNS: 1339370</a>
+            <a href="#" style="opacity:0.5;font-size:0.75rem;margin-top:0.5rem">PCNS: 1339370</a>
         </div>
     </div>
     <div class="footer-bottom">
@@ -680,6 +685,18 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 });
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then((reg) => {
+            console.log('[PWA] SW registered:', reg.scope);
+        }).catch((err) => {
+            console.error('[PWA] SW registration failed:', err);
+        });
+    });
+}
 </script>
 
 </body>
