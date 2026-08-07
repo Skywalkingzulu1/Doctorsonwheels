@@ -260,10 +260,19 @@
                 <div id="calloutFeeLine" style="display:none;color:var(--text-light)"><span>Callout Fee:</span><span>R<span id="calloutFeePrice">0</span></span></div>
                 <div style="display:flex;justify-content:space-between;font-weight:700;margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem"><span>Total:</span><span>R<span id="totalPrice">0</span></span></div>
                 <div style="display:flex;flex-direction:column;gap:0.8rem;padding-top:0.8rem;margin-top:0.8rem;border-top:1px solid var(--border)">
-                    <div style="font-weight:600;font-size:0.85rem;display:flex;align-items:center;gap:8px;color:var(--text)">
-                        <i class="fas fa-credit-card" style="color:var(--primary)"></i> Pay with Yoco Secure Checkout (Credit/Debit Card)
-                        <input type="radio" name="payMethod" id="payWithYoco" checked style="display:none">
-                    </div>
+                    <label style="font-weight:700;font-size:0.85rem;color:var(--text);margin-bottom:0.2rem">Choose Payment Flow:</label>
+                    <label style="font-size:0.85rem;display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;background:white;border-radius:8px;border:1px solid var(--border)">
+                        <input type="radio" name="payMethod" id="payWithYoco" value="card" checked>
+                        <i class="fas fa-credit-card" style="color:var(--primary)"></i> <strong>Credit / Debit Card (Yoco)</strong>
+                    </label>
+                    <label style="font-size:0.85rem;display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;background:white;border-radius:8px;border:1px solid var(--border)">
+                        <input type="radio" name="payMethod" id="payWithMedAid" value="medical_aid">
+                        <i class="fas fa-notes-medical" style="color:#0284c7"></i> <strong>Medical Aid Claim (Discovery, GEMS, etc.)</strong>
+                    </label>
+                    <label style="font-size:0.85rem;display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;background:white;border-radius:8px;border:1px solid var(--border)">
+                        <input type="radio" name="payMethod" id="payWithDigital" value="digital">
+                        <i class="fas fa-bolt" style="color:#7c3aed"></i> <strong>Digital Payment & Instant EFT</strong>
+                    </label>
                 </div>
             </div>
             
@@ -702,33 +711,36 @@
                 })
             });
             
-            if (payMethod === 'payWithYoco') {
-                const multiplier = selectedDoctor.peak_pricing_multiplier || 1.0;
-                const isNurse = (selectedDoctor.specialty && selectedDoctor.specialty.toLowerCase().includes('nurse')) || 
-                                (selectedDoctor.name && selectedDoctor.name.toLowerCase().includes('nurse'));
-                const baseVal = (selectedTier.id === 'VIDEO_CALL' || selectedTier.id === 'FULL_CONSULTATION') ? (isNurse ? 450 : 800) : selectedTier.base;
-                const basePrice = Math.round(baseVal * multiplier);
-                const calloutFee = distance * 30;
-                
-                let discount = 0;
-                if (currentUser.inconvenience_discount_active) {
-                    discount = Math.min(currentUser.inconvenience_discount_amount, basePrice + calloutFee);
-                }
-                const totalCost = basePrice + calloutFee - discount;
+            const payMethodRadio = document.querySelector('input[name="payMethod"]:checked');
+            const chosenMethod = payMethodRadio ? payMethodRadio.value : 'card';
 
-                // Initiate Yoco payment redirect
-                const yoco = await apiCall('/api/yoco/initiate', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        appointment_id: appointment.id,
-                        amount_zar: totalCost
-                    })
-                });
+            const multiplier = selectedDoctor.peak_pricing_multiplier || 1.0;
+            const isNurse = (selectedDoctor.specialty && selectedDoctor.specialty.toLowerCase().includes('nurse')) || 
+                            (selectedDoctor.name && selectedDoctor.name.toLowerCase().includes('nurse'));
+            const baseVal = (selectedTier.id === 'VIDEO_CALL' || selectedTier.id === 'FULL_CONSULTATION') ? (isNurse ? 450 : 800) : selectedTier.base;
+            const basePrice = Math.round(baseVal * multiplier);
+            const calloutFee = distance * 30;
+            
+            let discount = 0;
+            if (currentUser.inconvenience_discount_active) {
+                discount = Math.min(currentUser.inconvenience_discount_amount, basePrice + calloutFee);
+            }
+            const totalCost = basePrice + calloutFee - discount;
 
-                if (yoco.checkout_url) {
-                    window.location.href = yoco.checkout_url;
-                    return;
-                }
+            // Initiate payment redirect with method parameter
+            const yoco = await apiCall('/api/yoco/initiate', {
+                method: 'POST',
+                body: JSON.stringify({
+                    appointment_id: appointment.id,
+                    amount_zar: totalCost,
+                    payment_method: chosenMethod
+                })
+            });
+
+            if (yoco.checkout_url) {
+                window.location.href = yoco.checkout_url;
+                return;
+            }
             }
 
             alert('Appointment created! Please provide some more information for your doctor.');

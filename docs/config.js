@@ -798,12 +798,13 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                 return new Response(JSON.stringify(updated), { status: 200, headers: { 'Content-Type': 'application/json' } });
             }
 
-            // --- YOCO PAYMENTS ---
+            // --- PAYMENTS & CHECKOUT ---
             if (path === '/api/yoco/initiate' && method === 'POST') {
                 const body = JSON.parse(init.body);
                 const basePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                const payMethodParam = body.payment_method ? `&method=${encodeURIComponent(body.payment_method)}` : '';
                 return new Response(JSON.stringify({
-                    checkout_url: window.location.origin + basePath + `/yoco_checkout.html?appointment_id=${body.appointment_id}&amount=${body.amount_zar}`
+                    checkout_url: window.location.origin + basePath + `/yoco_checkout.html?appointment_id=${body.appointment_id}&amount=${body.amount_zar}${payMethodParam}`
                 }), { status: 200, headers: { 'Content-Type': 'application/json' } });
             }
 
