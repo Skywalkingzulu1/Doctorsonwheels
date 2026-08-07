@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZX7H7BJ8XY"></script>
+    <!-- Global Error Guard -->
     <script>
+      window.addEventListener('unhandledrejection', function(event) {
+          console.warn('Caught external SDK promise rejection:', event.reason);
+          if (event && event.preventDefault) event.preventDefault();
+      });
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
@@ -486,6 +489,12 @@
 <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
 <script src="config.js"></script>
 <script>
+    // Handle unhandled promise rejections gracefully from external SDKs
+    window.addEventListener('unhandledrejection', function(event) {
+        console.warn('Captured SDK Promise Rejection:', event.reason);
+        event.preventDefault();
+    });
+
     const urlParams = new URLSearchParams(window.location.search);
     const amountStr = urlParams.get('amount') || '800';
     const amount = Number(amountStr);
