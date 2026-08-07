@@ -31,6 +31,7 @@
             --border: #dfe1e6;
             --medical-aid: #0284c7;
             --digital-pay: #7c3aed;
+            --speedpoint: #e11d48;
         }
 
         * {
@@ -115,12 +116,18 @@
         /* 3 Payment Tabs Navigation */
         .payment-tabs {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 8px;
             background: #f1f5f9;
             padding: 6px;
             border-radius: 14px;
             margin-bottom: 22px;
+        }
+
+        @media (max-width: 480px) {
+            .payment-tabs {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .tab-btn {
@@ -155,6 +162,10 @@
 
         .tab-btn.active.digital {
             color: var(--digital-pay);
+        }
+
+        .tab-btn.active.speedpoint {
+            color: var(--speedpoint);
         }
 
         /* Form Content Areas */
@@ -263,33 +274,99 @@
 
         /* Pay Button */
         .btn-pay {
-            background: var(--text-dark);
-            color: white;
+            background: linear-gradient(135deg, #0f4c9e 0%, #0052cc 45%, #0085ff 100%);
+            color: #fff;
             border: none;
-            padding: 16px;
+            padding: 17px 20px;
             width: 100%;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 700;
+            font-family: inherit;
+            letter-spacing: 0.3px;
             cursor: pointer;
-            transition: all 0.25s;
-            box-shadow: 0 4px 14px rgba(23, 43, 77, 0.2);
+            transition: transform 0.15s ease, box-shadow 0.25s ease, filter 0.2s ease;
+            box-shadow: 0 10px 22px -8px rgba(0, 82, 204, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-pay::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.25) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
         }
 
         .btn-pay:hover {
-            background: #091e42;
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            filter: brightness(1.06);
+            box-shadow: 0 14px 28px -10px rgba(0, 82, 204, 0.55);
+        }
+
+        .btn-pay:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-pay:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 14px -6px rgba(0, 82, 204, 0.5);
         }
 
         .btn-pay:disabled {
-            background: var(--border);
-            color: var(--text-light);
+            background: linear-gradient(135deg, #cbd2e0, #aeb8cc);
+            color: rgba(255, 255, 255, 0.9);
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
+        }
+
+        .btn-pay:disabled::after {
+            display: none;
+        }
+
+        .btn-pay:focus-visible {
+            outline: 3px solid rgba(0, 133, 255, 0.45);
+            outline-offset: 2px;
+        }
+
+        .btn-pay.btn-medaid {
+            background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0ea5e9 100%);
+            box-shadow: 0 10px 22px -8px rgba(2, 132, 199, 0.5);
+        }
+
+        .btn-pay.btn-digital {
+            background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #a855f7 100%);
+            box-shadow: 0 10px 22px -8px rgba(124, 58, 237, 0.5);
+        }
+
+        .btn-pay.btn-speedpoint {
+            background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #f43f5e 100%);
+            box-shadow: 0 10px 22px -8px rgba(225, 29, 72, 0.5);
+        }
+
+        .btn-pay .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .btn-pay.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .secure-badge {
@@ -357,7 +434,7 @@
     <div id="error-message"></div>
     <div id="success-message"></div>
 
-    <!-- 3 Payment Method Tabs -->
+    <!-- 4 Payment Method Tabs -->
     <div class="payment-tabs">
         <button class="tab-btn active" id="tabCard" onclick="switchTab('card')">
             <i class="fas fa-credit-card"></i>
@@ -366,6 +443,10 @@
         <button class="tab-btn med-aid" id="tabMedAid" onclick="switchTab('medaid')">
             <i class="fas fa-notes-medical"></i>
             <span>Medical Aid</span>
+        </button>
+        <button class="tab-btn speedpoint" id="tabSpeedPoint" onclick="switchTab('speedpoint')">
+            <i class="fas fa-cash-register"></i>
+            <span>SpeedPoint</span>
         </button>
         <button class="tab-btn digital" id="tabDigital" onclick="switchTab('digital')">
             <i class="fas fa-bolt"></i>
@@ -471,12 +552,35 @@
             <label class="form-label">Connected Wallet Balance</label>
             <input type="text" class="form-input" value="100.00 STT (Somnia Testnet)" readonly>
         </div>
+
+        <div id="digitalDetailOzow" class="form-group" style="display:none;">
+            <label class="form-label">Ozow Pay</label>
+            <input type="tel" id="ozowPhone" class="form-input" placeholder="e.g. 082 123 4567">
+            <p style="font-size:11px; color:var(--text-light); margin-top:6px;">A secure Ozow payment link will be sent to your phone.</p>
+        </div>
+    </div>
+
+    <!-- FLOW 4: SpeedPoint (Lesaka Gateway) -->
+    <div class="tab-content" id="contentSpeedPoint">
+        <div class="form-group">
+            <label class="form-label">Payment Reference</label>
+            <input type="text" id="spRef" class="form-input" readonly>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Send Secure Payment Link To</label>
+            <input type="text" id="spContact" class="form-input" placeholder="Cell or email e.g. 082 123 4567">
+        </div>
+        <p style="font-size:11px; color:var(--text-light); margin-top:6px;">
+            SpeedPoint is Lesaka's trusted South African payment gateway. A secure, PCI-DSS compliant
+            payment link will be sent to your phone or email to complete the card payment.
+        </p>
     </div>
 
     <!-- Submit Payment Button -->
     <button class="btn-pay" id="payBtn" onclick="processPayment()">
-        <i class="fas fa-lock"></i>
+        <i class="fas fa-lock" id="btnIcon"></i>
         <span id="btnText">Pay R800.00 with Card</span>
+        <span class="spinner" aria-hidden="true"></span>
     </button>
 
     <div class="secure-badge">
@@ -489,12 +593,6 @@
 <script src="https://js.yoco.com/sdk/v1/yoco-sdk-web.js"></script>
 <script src="config.js"></script>
 <script>
-    // Handle unhandled promise rejections gracefully from external SDKs
-    window.addEventListener('unhandledrejection', function(event) {
-        console.warn('Captured SDK Promise Rejection:', event.reason);
-        event.preventDefault();
-    });
-
     const urlParams = new URLSearchParams(window.location.search);
     const amountStr = urlParams.get('amount') || '800';
     const amount = Number(amountStr);
@@ -509,12 +607,15 @@
 
     // Initial setup
     document.getElementById('displayAmount').textContent = 'R' + amount.toFixed(2);
+    document.getElementById('spRef').value = 'SP-' + Math.random().toString(36).substring(2, 10).toUpperCase();
     updatePayButtonText();
 
     // Check pre-selected flow from URL
     const preMethod = urlParams.get('method');
     if (preMethod === 'medical_aid' || preMethod === 'medaid') {
         switchTab('medaid');
+    } else if (preMethod === 'speedpoint' || preMethod === 'pos') {
+        switchTab('speedpoint');
     } else if (preMethod === 'digital' || preMethod === 'eft') {
         switchTab('digital');
     }
@@ -556,6 +657,9 @@
         } else if (tab === 'medaid') {
             document.getElementById('tabMedAid').classList.add('active');
             document.getElementById('contentMedAid').classList.add('active');
+        } else if (tab === 'speedpoint') {
+            document.getElementById('tabSpeedPoint').classList.add('active');
+            document.getElementById('contentSpeedPoint').classList.add('active');
         } else if (tab === 'digital') {
             document.getElementById('tabDigital').classList.add('active');
             document.getElementById('contentDigital').classList.add('active');
@@ -570,10 +674,14 @@
         document.getElementById('digitalDetailEft').style.display = 'none';
         document.getElementById('digitalDetailQr').style.display = 'none';
         document.getElementById('digitalDetailWallet').style.display = 'none';
+        document.getElementById('digitalDetailOzow').style.display = 'none';
 
-        if (opt === 'eft' || opt === 'ozow') {
-            document.getElementById('opt' + (opt === 'eft' ? 'Eft' : 'Ozow')).classList.add('selected');
+        if (opt === 'eft') {
+            document.getElementById('optEft').classList.add('selected');
             document.getElementById('digitalDetailEft').style.display = 'block';
+        } else if (opt === 'ozow') {
+            document.getElementById('optOzow').classList.add('selected');
+            document.getElementById('digitalDetailOzow').style.display = 'block';
         } else if (opt === 'qr') {
             document.getElementById('optQr').classList.add('selected');
             document.getElementById('digitalDetailQr').style.display = 'block';
@@ -586,17 +694,31 @@
 
     function updatePayButtonText() {
         const btnText = document.getElementById('btnText');
+        const btnIcon = document.getElementById('btnIcon');
         const payBtn = document.getElementById('payBtn');
-        payBtn.style.background = 'var(--text-dark)';
+        payBtn.classList.remove('btn-medaid', 'btn-digital', 'btn-speedpoint');
 
         if (activeTab === 'card') {
+            btnIcon.className = 'fas fa-lock';
             btnText.textContent = `Pay R${amount.toFixed(2)} with Card`;
+        } else if (activeTab === 'speedpoint') {
+            payBtn.classList.add('btn-speedpoint');
+            btnIcon.className = 'fas fa-cash-register';
+            btnText.textContent = `Pay R${amount.toFixed(2)} via SpeedPoint`;
         } else if (activeTab === 'medaid') {
-            payBtn.style.background = 'var(--medical-aid)';
+            payBtn.classList.add('btn-medaid');
+            btnIcon.className = 'fas fa-notes-medical';
             btnText.textContent = `Submit R${amount.toFixed(2)} Medical Aid Claim`;
         } else if (activeTab === 'digital') {
-            payBtn.style.background = 'var(--digital-pay)';
-            btnText.textContent = `Pay R${amount.toFixed(2)} via Digital EFT`;
+            payBtn.classList.add('btn-digital');
+            btnIcon.className = 'fas fa-bolt';
+            const digitalLabels = {
+                eft: 'Instant EFT',
+                qr: 'SnapScan / Zapper',
+                wallet: 'Somnia STT Wallet',
+                ozow: 'Ozow Instant Pay'
+            };
+            btnText.textContent = `Pay R${amount.toFixed(2)} via ${digitalLabels[activeDigitalOpt] || 'Digital EFT'}`;
         }
     }
 
@@ -608,6 +730,7 @@
         errorDiv.style.display = 'none';
         successDiv.style.display = 'none';
         btn.disabled = true;
+        btn.classList.add('loading');
 
         if (activeTab === 'card') {
             document.getElementById('btnText').textContent = 'Processing Card Payment...';
@@ -622,6 +745,7 @@
                     errorDiv.textContent = `Card error: ${err.message}`;
                     errorDiv.style.display = 'block';
                     btn.disabled = false;
+                    btn.classList.remove('loading');
                     updatePayButtonText();
                 }
             }
@@ -636,6 +760,7 @@
                 errorDiv.textContent = 'Please enter your Medical Aid Membership Number.';
                 errorDiv.style.display = 'block';
                 btn.disabled = false;
+                btn.classList.remove('loading');
                 return;
             }
 
@@ -654,11 +779,21 @@
                 await finalizePayment('MEDICAL_AID', JSON.stringify(claimData));
             }, 1400);
 
+        } else if (activeTab === 'speedpoint') {
+            document.getElementById('btnText').textContent = 'Generating Secure Payment Link...';
+            const contact = document.getElementById('spContact').value.trim();
+            const ref = document.getElementById('spRef').value || 'SP-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+
+            setTimeout(async () => {
+                await finalizePayment('SPEEDPOINT', ref + (contact ? ' → ' + contact : ''));
+            }, 1200);
+
         } else if (activeTab === 'digital') {
             document.getElementById('btnText').textContent = 'Authorizing Digital Transaction...';
             const methodDetail = activeDigitalOpt === 'eft' ? `Instant EFT (${document.getElementById('eftBank').value})` :
                                  activeDigitalOpt === 'qr' ? 'SnapScan QR Pay' :
-                                 activeDigitalOpt === 'wallet' ? 'Somnia STT Wallet' : 'Ozow Instant EFT';
+                                 activeDigitalOpt === 'wallet' ? 'Somnia STT Wallet' :
+                                 `Ozow Instant Pay (${document.getElementById('ozowPhone').value.trim() || 'registered number'})`;
 
             setTimeout(async () => {
                 await finalizePayment('DIGITAL_PAYMENT', methodDetail);
@@ -693,8 +828,10 @@
                 throw new Error(errData.detail || "Failed to confirm payment");
             }
 
-            btn.style.background = '#36b37e';
+            btn.style.background = 'linear-gradient(135deg, #15803d 0%, #22c55e 100%)';
+            btn.classList.remove('loading');
             document.getElementById('btnText').textContent = 'Payment Completed ✓';
+            document.getElementById('btnIcon').className = 'fas fa-check-circle';
             
             successDiv.textContent = payMethod === 'MEDICAL_AID' ? 
                 'Medical Aid claim approved! Consultation confirmed.' : 
@@ -702,13 +839,14 @@
             successDiv.style.display = 'block';
 
             setTimeout(() => {
-                window.location.href = `index.html?payment=success&appt=${apptId || ''}`;
+                window.location.href = `patient_dashboard.html?payment=success&appt=${apptId || ''}`;
             }, 1600);
 
         } catch (e) {
             document.getElementById('error-message').textContent = `Checkout error: ${e.message}`;
             document.getElementById('error-message').style.display = 'block';
             btn.disabled = false;
+            btn.classList.remove('loading');
             updatePayButtonText();
         }
     }

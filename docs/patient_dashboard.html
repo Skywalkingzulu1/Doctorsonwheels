@@ -266,6 +266,10 @@
                         <i class="fas fa-credit-card" style="color:var(--primary)"></i> <strong>Credit / Debit Card (Yoco)</strong>
                     </label>
                     <label style="font-size:0.85rem;display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;background:white;border-radius:8px;border:1px solid var(--border)">
+                        <input type="radio" name="payMethod" id="payWithSpeedPoint" value="speedpoint">
+                        <i class="fas fa-cash-register" style="color:#e11d48"></i> <strong>SpeedPoint (Secure Card Pay)</strong>
+                    </label>
+                    <label style="font-size:0.85rem;display:flex;align-items:center;gap:10px;cursor:pointer;padding:8px 12px;background:white;border-radius:8px;border:1px solid var(--border)">
                         <input type="radio" name="payMethod" id="payWithMedAid" value="medical_aid">
                         <i class="fas fa-notes-medical" style="color:#0284c7"></i> <strong>Medical Aid Claim (Discovery, GEMS, etc.)</strong>
                     </label>
@@ -670,7 +674,8 @@
         const type = document.getElementById('bookingType').value;
         const location = document.getElementById('bookingLocation').value;
         
-        const payMethod = document.querySelector('input[name="payMethod"]:checked')?.id;
+        const payMethodRadio = document.querySelector('input[name="payMethod"]:checked');
+        const chosenMethod = payMethodRadio ? payMethodRadio.value : 'card';
         
         // Collect Rich Triage Data
         const triageData = {
@@ -706,14 +711,11 @@
                     reason: reason || triageData.chief_complaint,
                     location: type === 'INPERSON' ? location : null,
                     distance_km: distance,
-                    payment_method: 'yoco',
+                    payment_method: chosenMethod,
                     triage_data: JSON.stringify(triageData)
                 })
             });
             
-            const payMethodRadio = document.querySelector('input[name="payMethod"]:checked');
-            const chosenMethod = payMethodRadio ? payMethodRadio.value : 'card';
-
             const multiplier = selectedDoctor.peak_pricing_multiplier || 1.0;
             const isNurse = (selectedDoctor.specialty && selectedDoctor.specialty.toLowerCase().includes('nurse')) || 
                             (selectedDoctor.name && selectedDoctor.name.toLowerCase().includes('nurse'));
