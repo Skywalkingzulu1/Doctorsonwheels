@@ -101,6 +101,7 @@
               .main{margin-left:0}
               .stats{grid-template-columns:repeat(2,1fr)}
               .grid-2{grid-template-columns:1fr}
+              .credits-grid,.form-grid-2{grid-template-columns:1fr!important}
               .hamburger{display:flex !important}
           }
       </style>
@@ -211,7 +212,7 @@
                     </div>
                     <div class="card">
                         <div class="card-title">Add Funds (Rands)</div>
-                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem">
+                        <div class="credits-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem">
                             <button class="btn btn-secondary" onclick="buyCredits(100)">R100</button>
                             <button class="btn btn-secondary" onclick="buyCredits(250)">R250</button>
                             <button class="btn btn-primary" onclick="buyCredits(500)">R500</button>
@@ -286,7 +287,7 @@
                     <label class="form-label">Chief Complaint (Main Reason)</label>
                     <textarea id="triageReason" class="form-textarea" rows="2" placeholder="e.g. Severe headache, high fever"></textarea>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                <div class="form-grid-2" style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
                     <div class="form-group">
                         <label class="form-label">Duration of Symptoms</label>
                         <input type="text" id="triageDuration" class="form-input" placeholder="e.g. 3 days">

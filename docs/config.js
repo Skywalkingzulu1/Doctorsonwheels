@@ -272,7 +272,7 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                         const { data: newProfile } = await supabase.from('Profiles').insert({
                             id: nextId,
                             email: 'sam@sbtiinnovation.co.za',
-                            name: 'Dr. Sam',
+                            name: 'Dr. Samukele Luzulane',
                             role: 'DOCTOR'
                         }).select().single();
                         samProfile = newProfile;
@@ -284,9 +284,9 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                         await supabase.from('Doctors').insert({
                             id: nextDocId,
                             user_id: samProfile.id,
-                            name: 'Dr. Sam',
+                            name: 'Dr. Samukele Luzulane',
                             specialty: 'Cardiologist',
-                            area: 'Sandton, JHB',
+                            area: '136 2nd St, Randjespark, Midrand, 1685',
                             consultation_fee: 800,
                             is_available: true,
                             verification_status: 'verified',
@@ -435,6 +435,10 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                     query = query.eq('patient_id', profile.id);
                 }
 
+                const recType = urlObj.searchParams.get('type');
+                if (recType) query = query.eq('type', recType);
+                query = query.order('created_at', { ascending: false });
+
                 const { data: records, error } = await query;
                 if (error) throw new Error(error.message);
                 return new Response(JSON.stringify(records), { status: 200, headers: { 'Content-Type': 'application/json' } });
@@ -451,7 +455,9 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                     patient_id: body.patient_id,
                     doctor_id: body.doctor_id,
                     appointment_id: body.appointment_id,
-                    summary: body.summary
+                    summary: body.summary,
+                    type: body.type || null,
+                    title: body.title || null
                 }).select().single();
 
                 if (error) throw new Error(error.message);
@@ -782,6 +788,20 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                     .eq('user_id', profile.id)
                     .select()
                     .single();
+                return new Response(JSON.stringify(updated), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+
+            if (path === '/api/profile/doctor/signature' && method === 'PUT') {
+                const emulatedEmail = localStorage.getItem('emulated_user_email');
+                if (!emulatedEmail) throw new Error('Not authenticated');
+                const { data: profile } = await supabase.from('Profiles').select('*').eq('email', emulatedEmail).single();
+                const body = JSON.parse(init.body);
+                const { data: updated, error: sError } = await supabase.from('Doctors')
+                    .update({ signature: body.signature || null })
+                    .eq('user_id', profile.id)
+                    .select()
+                    .single();
+                if (sError) throw new Error(sError.message);
                 return new Response(JSON.stringify(updated), { status: 200, headers: { 'Content-Type': 'application/json' } });
             }
 

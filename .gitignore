@@ -5,3 +5,6 @@ trash/
 .env
 .env.local
 .env.production
+
+# Supabase local CLI state (project links, versions)
+supabase/.temp/

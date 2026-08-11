@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Deletion Request — Doctors on Wheels</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --primary: #0052cc;
+    --primary-dark: #0747a6;
+    --primary-darker: #052d6e;
+    --secondary: #00a3bf;
+    --accent: #36b37e;
+    --accent-dark: #2a8f63;
+    --white: #ffffff;
+    --light: #f8fafc;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); line-height: 1.6; background: var(--light); }
+
+/* Navbar */
+.navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; transition: all 0.3s ease; }
+.nav-container { max-width: 1100px; margin: 0 auto; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+.navbar.scrolled { background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.navbar.scrolled .nav-container { padding: 0.75rem 2rem; }
+.nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--white); text-decoration: none; display: flex; align-items: center; gap: 0.5rem; letter-spacing: -0.5px; transition: color 0.3s; }
+.navbar.scrolled .nav-logo { color: var(--text); }
+.nav-logo i { font-size: 1.5rem; }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+.nav-link { color: rgba(255,255,255,0.85); text-decoration: none; font-weight: 500; font-size: 0.9rem; transition: color 0.2s; }
+.nav-link:hover { color: var(--white); }
+.navbar.scrolled .nav-link { color: var(--text); }
+.navbar.scrolled .nav-link:hover { color: var(--primary); }
+.nav-btns { display: flex; gap: 0.75rem; align-items: center; }
+.btn { padding: 0.6rem 1.4rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.25s ease; text-decoration: none; border: none; display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn-ghost-nav { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.3); }
+.btn-ghost-nav:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+.navbar.scrolled .btn-ghost-nav { color: var(--primary); border-color: var(--primary); background: transparent; }
+.navbar.scrolled .btn-ghost-nav:hover { background: var(--primary); color: var(--white); }
+.btn-primary-nav { background: var(--white); color: var(--primary); font-weight: 700; }
+.btn-primary-nav:hover { background: #f0f4ff; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.navbar.scrolled .btn-primary-nav { background: var(--primary); color: var(--white); }
+.navbar.scrolled .btn-primary-nav:hover { background: var(--primary-dark); }
+.hamburger { display: none; background: none; border: none; color: var(--white); font-size: 1.5rem; cursor: pointer; }
+.navbar.scrolled .hamburger { color: var(--text); }
+
+/* Mobile menu */
+.mobile-menu { position: fixed; top: 0; right: -100%; width: 280px; height: 100vh; background: var(--white); z-index: 2000; padding: 2rem; box-shadow: -4px 0 20px rgba(0,0,0,0.1); transition: right 0.3s ease; display: flex; flex-direction: column; gap: 1.25rem; }
+.mobile-menu.open { right: 0; }
+.mobile-menu .close-btn { align-self: flex-end; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text); margin-bottom: 1rem; }
+.mobile-menu a { color: var(--text); text-decoration: none; font-weight: 500; font-size: 1rem; padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+
+/* Content */
+.page-header { margin-top: 80px; background: linear-gradient(135deg, var(--primary-darker), var(--primary-dark), var(--primary)); padding: 4rem 2rem; text-align: center; }
+.page-header h1 { font-size: 2.5rem; font-weight: 800; color: var(--white); margin-bottom: 0.5rem; }
+.page-header p { color: rgba(255,255,255,0.8); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+.content { max-width: 800px; margin: 0 auto; padding: 3rem 2rem; }
+
+/* Info cards */
+.info-card { background: var(--white); border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border); }
+.info-card h2 { font-size: 1.15rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+.info-card h2 i { font-size: 1.1rem; }
+.info-card p, .info-card li { color: var(--text-muted); font-size: 0.95rem; line-height: 1.7; }
+.info-card ul { padding-left: 1.25rem; }
+.info-card li { margin-bottom: 0.5rem; }
+
+/* Form */
+.form-card { background: var(--white); border-radius: 12px; padding: 2.5rem; box-shadow: var(--shadow-md); border: 1px solid var(--border); margin-bottom: 2rem; }
+.form-card h2 { font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 1.5rem; }
+.form-group { margin-bottom: 1.25rem; }
+.form-group label { display: block; font-weight: 600; font-size: 0.9rem; color: var(--text); margin-bottom: 0.4rem; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--text); transition: border-color 0.2s; background: var(--light); }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,82,204,0.1); }
+.form-group textarea { resize: vertical; min-height: 100px; }
+.form-group .hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem; }
+.btn-submit { background: var(--primary); color: var(--white); padding: 0.85rem 2rem; border: none; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 0.5rem; }
+.btn-submit:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Alert */
+.alert { padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.95rem; display: none; }
+.alert-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; display: block; }
+.alert-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; display: block; }
+
+/* Footer */
+.footer { background: #0f172a; color: rgba(255,255,255,0.7); padding: 4rem 2rem 1.5rem; margin-top: 3rem; }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; }
+.footer-brand h3 { color: var(--white); font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; }
+.footer-brand p { font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+.footer-social { display: flex; gap: 1rem; }
+.footer-social a { color: rgba(255,255,255,0.5); font-size: 1.1rem; transition: color 0.2s; }
+.footer-social a:hover { color: var(--white); }
+.footer-col h4 { color: var(--white); font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.footer-col a { display: block; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.88rem; margin-bottom: 0.65rem; transition: color 0.2s; }
+.footer-col a:hover { color: var(--white); }
+.footer-bottom { max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; font-size: 0.82rem; }
+@media (max-width: 768px) {
+    .nav-links, .nav-btns { display: none; }
+    .hamburger { display: block; }
+    .footer-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+    .page-header h1 { font-size: 1.8rem; }
+    .content { padding: 2rem 1.25rem; }
+    .form-card { padding: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo"><i class="fas fa-notes-medical"></i> Doctors on Wheels</a>
+        <div class="nav-links">
+            <a href="index.html#features" class="nav-link">Features</a>
+            <a href="index.html#how" class="nav-link">How It Works</a>
+            <a href="index.html#team" class="nav-link">Team</a>
+        </div>
+        <div class="nav-btns">
+            <a href="login.html" class="btn btn-ghost-nav">Log In</a>
+            <a href="register.html" class="btn btn-primary-nav">Sign Up Free</a>
+        </div>
+        <button class="hamburger" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+    </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+    <button class="close-btn" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
+    <a href="index.html" onclick="toggleMobileMenu()">Home</a>
+    <a href="index.html#features" onclick="toggleMobileMenu()">Features</a>
+    <a href="index.html#how" onclick="toggleMobileMenu()">How It Works</a>
+    <a href="index.html#team" onclick="toggleMobileMenu()">Team</a>
+    <a href="login.html" onclick="toggleMobileMenu()">Log In</a>
+    <a href="register.html" onclick="toggleMobileMenu()">Sign Up Free</a>
+</div>
+
+<section class="page-header">
+    <h1>Account Deletion Request</h1>
+    <p>Request the deletion of your personal data from the Doctors on Wheels platform</p>
+</section>
+
+<div class="content">
+
+    <div id="formAlert" class="alert" style="display:none"></div>
+
+    <div class="form-card">
+        <h2><i class="fas fa-paper-plane" style="color:var(--primary)"></i> Submit Your Request</h2>
+        <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:1.5rem">Fill in the details below and we'll process your account deletion within 14 business days, as required by POPIA.</p>
+        <form id="deleteForm" onsubmit="return handleSubmit(event)">
+            <div class="form-group">
+                <label for="fullName">Full Name</label>
+                <input type="text" id="fullName" name="fullName" required placeholder="e.g. John Doe">
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required placeholder="e.g. john@example.com">
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <input type="tel" id="phone" name="phone" placeholder="e.g. 072 123 4567">
+            </div>
+            <div class="form-group">
+                <label for="reason">Reason for Deletion</label>
+                <select id="reason" name="reason" required>
+                    <option value="">Select a reason...</option>
+                    <option value="no-longer-needed">No longer need the service</option>
+                    <option value="privacy-concerns">Privacy concerns</option>
+                    <option value="duplicate-account">Duplicate account</option>
+                    <option value="switching-provider">Switching to another provider</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="details">Additional Details <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <textarea id="details" name="details" placeholder="Any additional information you'd like us to know..."></textarea>
+            </div>
+            <button type="submit" class="btn-submit" id="submitBtn"><i class="fas fa-paper-plane"></i> Submit Request</button>
+        </form>
+    </div>
+
+    <div class="info-card">
+        <h2><i class="fas fa-info-circle" style="color:var(--primary)"></i> What Happens When You Request Deletion</h2>
+        <ol style="padding-left:1.25rem">
+            <li><strong>Account Deactivated</strong> — Your account is immediately deactivated upon receiving your request.</li>
+            <li><strong>Data Reviewed</strong> — Our team reviews your request and identifies all personal data associated with your account.</li>
+            <li><strong>Data Deleted</strong> — Personal data is permanently deleted, subject to legal retention periods (see below).</li>
+            <li><strong>Confirmation</strong> — You'll receive a confirmation email once the process is complete.</li>
+        </ol>
+    </div>
+
+    <div class="info-card">
+        <h2><i class="fas fa-clock" style="color:var(--accent)"></i> Data Retention (POPIA &amp; HPCSA)</h2>
+        <p>We comply with the <strong>Protection of Personal Information Act (POPIA)</strong> and <strong>Health Professions Council of South Africa (HPCSA)</strong> guidelines. Certain data may be retained for legal and regulatory purposes:</p>
+        <ul>
+            <li><strong>Medical Records:</strong> Retained for a minimum of 6 years from the last consultation date, as required by HPCSA.</li>
+            <li><strong>Financial Records:</strong> Retained for 5 years as required by South African tax law.</li>
+            <li><strong>Communication Logs:</strong> Anonymised usage logs may be retained for platform security and analytics.</li>
+        </ul>
+        <p style="margin-top:0.75rem">After the applicable retention period, all remaining data is permanently and irreversibly deleted.</p>
+    </div>
+
+    <div class="info-card">
+        <h2><i class="fas fa-envelope" style="color:var(--secondary)"></i> Need Help?</h2>
+        <p>If you have questions about the deletion process or need assistance:</p>
+        <ul>
+            <li><strong>Email:</strong> <a href="mailto:Doctorsonwheels@outlook.com?subject=Account%20Deletion%20Request" style="color:var(--primary)">Doctorsonwheels@outlook.com</a></li>
+            <li><strong>Phone:</strong> 072 973 4610</li>
+            <li><strong>Practice Number:</strong> PCNS: 1339370</li>
+        </ul>
+        <p style="margin-top:0.75rem">You can also read our <a href="privacy.html" style="color:var(--primary)">Privacy Policy</a> for more information about your data rights under POPIA.</p>
+    </div>
+
+</div>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <h3><i class="fas fa-notes-medical" style="color:var(--secondary)"></i> Doctors on Wheels</h3>
+            <p>South Africa's on-demand healthcare platform. Connecting patients with verified doctors via video, chat, and home visits.</p>
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+        <div class="footer-col">
+            <h4>Platform</h4>
+            <a href="patient_dashboard.html">Find a Doctor</a>
+            <a href="doctor_dashboard.html">Doctor Portal</a>
+            <a href="about.html">About Us</a>
+        </div>
+        <div class="footer-col">
+            <h4>Account</h4>
+            <a href="login.html">Log In</a>
+            <a href="register.html">Sign Up</a>
+            <a href="#">Help Centre</a>
+        </div>
+        <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="delete-account.html">Account Deletion</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">HPCSA Compliance</a>
+            <a href="#" style="opacity:0.5;font-size:0.75rem;margin-top:0.5rem">PCNS: 1339370</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>&copy; 2026 Doctors on Wheels. All rights reserved. PCNS: 1339370</span>
+        <span>Made with care in South Africa</span>
+    </div>
+</footer>
+
+<script>
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 60); });
+
+function toggleMobileMenu() { document.getElementById('mobileMenu').classList.toggle('open'); }
+
+function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const alert = document.getElementById('formAlert');
+    const form = document.getElementById('deleteForm');
+
+    const name = form.fullName.value.trim();
+    const email = form.email.value.trim();
+    const phone = form.phone.value.trim();
+    const reason = form.reason.value;
+    const details = form.details.value.trim();
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    const subject = encodeURIComponent('Account Deletion Request — ' + name);
+    const body = encodeURIComponent(
+        'Account Deletion Request\n' +
+        '========================\n\n' +
+        'Full Name: ' + name + '\n' +
+        'Email: ' + email + '\n' +
+        'Phone: ' + (phone || 'Not provided') + '\n' +
+        'Reason: ' + reason + '\n' +
+        'Details: ' + (details || 'Not provided') + '\n\n' +
+        '---\n' +
+        'Submitted via Doctors on Wheels account deletion page'
+    );
+
+    const mailto = 'mailto:Doctorsonwheels@outlook.com?subject=' + subject + '&body=' + body;
+    window.location.href = mailto;
+
+    alert.className = 'alert alert-success';
+    alert.style.display = 'block';
+    alert.innerHTML = '<strong>Request submitted!</strong> Please check your email client to send the message. We\'ll process your request within 14 business days.';
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Request';
+    form.reset();
+    return false;
+}
+</script>
+</body>
+</html>

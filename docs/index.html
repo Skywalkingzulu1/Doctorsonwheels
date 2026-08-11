@@ -367,6 +367,22 @@
         .reveal-delay-2 { transition-delay: 0.2s; }
         .reveal-delay-3 { transition-delay: 0.3s; }
 
+        /* ===== MOBILE MENU ===== */
+        .mobile-menu {
+            display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(20px); z-index: 1001; padding: 5rem 2rem 2rem;
+            flex-direction: column; gap: 1rem;
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            font-size: 1.2rem; font-weight: 600; color: var(--text);
+            text-decoration: none; padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+        }
+        .mobile-menu .close-btn {
+            position: absolute; top: 1.5rem; right: 1.5rem; background: none;
+            border: none; font-size: 1.5rem; color: var(--text); cursor: pointer;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
             .features-grid { grid-template-columns: repeat(2, 1fr); }
@@ -375,20 +391,6 @@
             .nav-links, .nav-btns { display: none; }
             .hamburger { display: block; }
             .nav-container { padding: 0.75rem 1.25rem; }
-            .mobile-menu {
-                display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.98);
-                backdrop-filter: blur(20px); z-index: 1001; padding: 5rem 2rem 2rem;
-                flex-direction: column; gap: 1rem;
-            }
-            .mobile-menu.open { display: flex; }
-            .mobile-menu a {
-                font-size: 1.2rem; font-weight: 600; color: var(--text);
-                text-decoration: none; padding: 0.75rem 0; border-bottom: 1px solid var(--border);
-            }
-            .mobile-menu .close-btn {
-                position: absolute; top: 1.5rem; right: 1.5rem; background: none;
-                border: none; font-size: 1.5rem; color: var(--text); cursor: pointer;
-            }
             .stats-container { grid-template-columns: repeat(2, 1fr); }
             .features-grid { grid-template-columns: 1fr; }
             .how-grid { grid-template-columns: repeat(2, 1fr); }
@@ -564,9 +566,15 @@
     <div class="team-grid">
         <div class="team-card reveal">
             <div class="team-avatar blue">SL</div>
-            <h3>Dr Sam Luzulane</h3>
+            <h3>Dr Samukele Luzulane</h3>
             <div class="team-role">Co-Founder &amp; Medical Director</div>
             <p>Practicing medical doctor passionate about making healthcare accessible to every South African, regardless of location.</p>
+            <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); font-size:0.85rem; color:var(--text-muted); text-align:left;">
+                <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Practice Details</div>
+                <div>136 2nd St, Randjespark, Midrand, 1685</div>
+                <div>Practice No: PCNS 1339370</div>
+                <div>072 973 4610</div>
+            </div>
         </div>
         <div class="team-card reveal reveal-delay-1">
             <div class="team-avatar green">AM</div>
@@ -617,6 +625,7 @@
         <div class="footer-col">
             <h4>Legal</h4>
             <a href="privacy.html">Privacy Policy</a>
+            <a href="delete-account.html">Account Deletion</a>
             <a href="#">Terms of Service</a>
             <a href="#">HPCSA Compliance</a>
             <a href="#" style="opacity:0.5;font-size:0.75rem;margin-top:0.5rem">PCNS: 1339370</a>

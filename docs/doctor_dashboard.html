@@ -99,13 +99,26 @@
         .hamburger:hover { background: var(--em-light-blue); color: var(--em-blue); }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); z-index: 800; }
         .sidebar-overlay.active { display: block; }
+
+        /* Signature Pad */
+        .sig-canvas { display: block; width: 100%; height: 200px; border: 2px dashed var(--em-border); border-radius: 8px; background: white; touch-action: none; cursor: crosshair; }
+
         @media (max-width: 768px) {
             .sidebar { display: none; }
             .sidebar.mobile-open { display: flex !important; transform: translateX(0) !important; }
             .main-stage { margin-left: 0; }
             .header { padding: 0 1rem; }
             .hamburger { display: flex !important; }
-.search-bar { display: none; }
+            .search-bar { display: none; }
+            .content { padding: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+            .modal-body { grid-template-columns: 1fr; gap: 1rem; }
+            .modal-content { max-width: 100%; }
+            .hub-grid, .make-notes-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
+            .med-row, .direct-med-row { grid-template-columns: repeat(2, 1fr) !important; }
+            .doc-type-grid { grid-template-columns: 1fr 1fr !important; }
+            .em-card { overflow-x: auto; }
+            .sig-canvas { height: 160px; }
          }
 
          /* Splash Screen */
@@ -154,6 +167,7 @@
                 <div class="nav-item" data-target="pricing"><i class="fas fa-coins"></i> Billing</div>
                 <div class="nav-item" data-target="make-notes"><i class="fas fa-file-signature"></i> Create Notes & Letters</div>
                 <div class="nav-item" data-target="templates"><i class="fas fa-file-pdf"></i> Document Templates</div>
+                <div class="nav-item" data-target="records"><i class="fas fa-folder-open"></i> Saved Documents</div>
             </nav>
             <div style="padding: 1.5rem; border-top: 1px solid var(--em-border);">
                 <div class="nav-item" onclick="handleLogout()" style="color: var(--em-danger);"><i class="fas fa-sign-out"></i> Log Out</div>
@@ -187,7 +201,7 @@
                         <div class="stat-card"><div class="stat-val" id="countCredits">R 0</div><div class="stat-lab">Practice Revenue</div></div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns: 2fr 1fr; gap:1.5rem;">
+                    <div class="hub-grid" style="display:grid; grid-template-columns: 2fr 1fr; gap:1.5rem;">
                         <div class="em-card">
                             <div class="card-header">Priority Triage Queue</div>
                             <div id="pendingList" style="padding:0;"></div>
@@ -245,7 +259,7 @@
                 <!-- VIEW: CREATE NOTES & LETTERS -->
                 <section id="view-make-notes" class="hidden">
                     <div class="page-title"><h2>Create Clinical Notes & Letters</h2></div>
-                    <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap:2rem; align-items:start;">
+                    <div class="make-notes-grid" style="display:grid; grid-template-columns: 1fr 1.3fr; gap:2rem; align-items:start;">
                         <!-- Input Card -->
                         <div class="em-card">
                             <div class="card-header">Document Parameters</div>
@@ -275,6 +289,29 @@
                                     </div>
                                     <button class="btn btn-sm btn-ghost" onclick="addDirectMedRow()" style="margin-top:0.3rem;"><i class="fas fa-plus"></i> Add Medication</button>
                                 </div>
+                                <div id="directSoapFields" class="hidden" style="margin-bottom:1rem; padding:0.75rem; background:var(--em-light-blue); border-radius:8px; border:1px solid var(--em-blue);">
+                                    <div style="font-size:0.75rem; font-weight:700; color:var(--em-blue); margin-bottom:0.5rem; text-transform:uppercase;">
+                                        <i class="fas fa-clipboard-list"></i> SOAP Note Structure
+                                    </div>
+                                    <div style="display:grid; gap:0.75rem;">
+                                        <div>
+                                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Subjective (History)</label>
+                                            <textarea id="directSoapSubjective" style="width:100%; padding:0.5rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Chief complaint, history of present illness..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Objective (Examination &amp; Findings)</label>
+                                            <textarea id="directSoapObjective" style="width:100%; padding:0.5rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Vitals, examination findings, investigations..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Assessment (Diagnosis)</label>
+                                            <textarea id="directSoapAssessment" style="width:100%; padding:0.5rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Working diagnosis / differential diagnosis..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Plan (Management &amp; Follow-up)</label>
+                                            <textarea id="directSoapPlan" style="width:100%; padding:0.5rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Treatment, medications, investigations, follow-up..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div style="display:flex; flex-direction:column; gap:0.75rem;">
                                     <button class="btn btn-ghost" onclick="generateDirectDocument('Sick Note')"><i class="fas fa-bed"></i> Generate Sick Note</button>
                                     <button class="btn btn-ghost" onclick="showDirectPrescriptionFields(); generateDirectDocument('Prescription')"><i class="fas fa-pills"></i> Generate Prescription</button>
@@ -296,7 +333,7 @@
                                             <div>
                                                 <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px; font-size:1.4rem;">Doctors on Wheels</h2>
                                                 <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
-                                                <p style="font-size:0.8rem; color:#333; margin:0; font-weight:600;">Dr Sam: 072 973 4610 | Doctorsonwheels@outlook.com</p>
+                                <p style="font-size:0.8rem; color:#333; margin:0; font-weight:600;">Dr Samukele Luzulane · 136 2nd St, Randjespark, Midrand, 1685 · PCNS 1339370 · 072 973 4610</p>
                                             </div>
                                         </div>
                                         <div style="text-align:right; font-size:0.85rem;">
@@ -324,23 +361,30 @@
                                                 <p><strong>Location:</strong> Digital Consultation / Home Visit</p>
                                             </div>
                                             <div style="text-align:center;">
-                                                <div style="font-family:'Dancing Script', cursive; font-size:1.5rem; border-bottom:1px solid #333; margin-bottom:0.5rem; padding:0 1rem;" id="directDocSignature"></div>
+                                                <div style="min-height:3.5rem; display:flex; align-items:flex-end; justify-content:center; border-bottom:1px solid #333; margin-bottom:0.4rem; padding:0 1rem;">
+                                                    <img id="directDocSignature" alt="Signature" style="max-height:3rem; max-width:160px; display:none;">
+                                                </div>
+                                                <div id="directDocSignatureName" style="font-size:0.85rem; color:#333; font-weight:600;"></div>
                                                 <p style="font-size:0.8rem; color:#666;">Electronically Signed</p>
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:2rem;">
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:1.25rem;">
+                                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem;">
                                         <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="downloadDirectDocument()">
                                             <i class="fas fa-download"></i> Download PDF
                                         </button>
-                                        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="emailDirectDocument()">
-                                            <i class="fas fa-envelope"></i> Email to Patient
-                                        </button>
-                                        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="saveDirectDocument()">
-                                            <i class="fas fa-save"></i> Save to Records
+                                        <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="openSignatureModal()">
+                                            <i class="fas fa-pen-nib"></i> Draw Signature
                                         </button>
                                     </div>
+                                    <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="emailDirectDocument()">
+                                        <i class="fas fa-envelope"></i> Email to Patient
+                                    </button>
+                                    <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="saveDirectDocument()">
+                                        <i class="fas fa-save"></i> Save to Records
+                                    </button>
                                 </div>
                                 <div id="directPreviewPlaceholder" style="text-align:center; padding:5rem 2rem; color:var(--em-text-muted);">
                                     <i class="fas fa-file-signature" style="font-size:4rem; margin-bottom:1rem; opacity:0.3;"></i>
@@ -381,6 +425,24 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- VIEW: SAVED DOCUMENTS -->
+                <section id="view-records" class="hidden">
+                    <div class="page-title"><h2>Saved Documents</h2></div>
+                    <div class="em-card">
+                        <div class="card-header">Filter by document type</div>
+                        <div class="card-body">
+                            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:1.5rem;">
+                                <button class="btn btn-sm btn-primary doc-tab active" data-type="" onclick="loadSavedDocs('')">All</button>
+                                <button class="btn btn-sm btn-ghost doc-tab" data-type="Clinical Note" onclick="loadSavedDocs('Clinical Note')">Clinical Notes</button>
+                                <button class="btn btn-sm btn-ghost doc-tab" data-type="Sick Note" onclick="loadSavedDocs('Sick Note')">Sick Notes</button>
+                                <button class="btn btn-sm btn-ghost doc-tab" data-type="Referral Letter" onclick="loadSavedDocs('Referral Letter')">Referrals</button>
+                                <button class="btn btn-sm btn-ghost doc-tab" data-type="Prescription" onclick="loadSavedDocs('Prescription')">Prescriptions</button>
+                            </div>
+                            <div id="savedDocsList"></div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </main>
     </div>
@@ -417,7 +479,7 @@
                     <textarea id="scribeContext" style="width:100%; padding:0.75rem; border:1px solid var(--em-border); border-radius:8px; font-size:0.9rem;" rows="3" placeholder="Notes from consultation to include in document..."></textarea>
                 </div>
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:0.5rem; margin-bottom:1.5rem;">
+                <div class="doc-type-grid" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:0.5rem; margin-bottom:1.5rem;">
                     <button class="btn btn-ghost btn-sm" onclick="generateDocument('Sick Note')"><i class="fas fa-bed"></i> Sick Note</button>
                     <button class="btn btn-ghost btn-sm" onclick="showPrescriptionFields(); generateDocument('Prescription')"><i class="fas fa-pills"></i> Prescription</button>
                     <button class="btn btn-ghost btn-sm" onclick="generateDocument('Referral Letter')"><i class="fas fa-file-export"></i> Referral</button>
@@ -440,6 +502,30 @@
                     <button class="btn btn-sm btn-ghost" onclick="addMedRow()" style="margin-top:0.5rem;"><i class="fas fa-plus"></i> Add Medication</button>
                 </div>
 
+                <div id="soapFields" class="hidden" style="margin-bottom:1.5rem; padding:1rem; background:var(--em-light-blue); border-radius:8px; border:1px solid var(--em-blue);">
+                    <div style="font-size:0.8rem; font-weight:700; color:var(--em-blue); margin-bottom:0.75rem; text-transform:uppercase;">
+                        <i class="fas fa-clipboard-list"></i> SOAP Note Structure
+                    </div>
+                    <div style="display:grid; gap:0.75rem;">
+                        <div>
+                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Subjective (History)</label>
+                            <textarea id="soapSubjective" style="width:100%; padding:0.6rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Chief complaint, history of present illness, review of systems..."></textarea>
+                        </div>
+                        <div>
+                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Objective (Examination &amp; Findings)</label>
+                            <textarea id="soapObjective" style="width:100%; padding:0.6rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Vitals, examination findings, investigations..."></textarea>
+                        </div>
+                        <div>
+                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Assessment (Diagnosis)</label>
+                            <textarea id="soapAssessment" style="width:100%; padding:0.6rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Working diagnosis / differential diagnosis..."></textarea>
+                        </div>
+                        <div>
+                            <label class="nav-label" style="padding:0; margin-bottom:0.25rem; display:block;">Plan (Management &amp; Follow-up)</label>
+                            <textarea id="soapPlan" style="width:100%; padding:0.6rem; border:1px solid var(--em-border); border-radius:6px; font-size:0.85rem;" rows="2" placeholder="Treatment, medications, investigations, follow-up..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="documentPreview" class="hidden" style="border:1px solid var(--em-border); padding:2rem; background:white; font-family:'Times New Roman', serif; position:relative; min-height:500px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
                     <!-- Header -->
                     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #333; padding-bottom:1.5rem; margin-bottom:2rem;">
@@ -448,7 +534,7 @@
                             <div>
                                 <h2 style="margin:0; font-weight:800; color:var(--em-blue); text-transform:uppercase; letter-spacing:1px;">Doctors on Wheels</h2>
                                 <p style="font-size:0.8rem; color:#666; margin:0;">24/7 Mobile Medical Excellence | South Africa</p>
-                                <p style="font-size:0.8rem; color:#333; margin:0; font-weight:600;">Dr Sam: 072 973 4610 | Doctorsonwheels@outlook.com</p>
+                                                <p style="font-size:0.8rem; color:#333; margin:0; font-weight:600;">Dr Samukele Luzulane · 136 2nd St, Randjespark, Midrand, 1685 · PCNS 1339370 · 072 973 4610</p>
                             </div>
                         </div>
                         <div style="text-align:right; font-size:0.85rem;">
@@ -476,16 +562,53 @@
                                 <p><strong>Location:</strong> Digital Consultation / Home Visit</p>
                             </div>
                             <div style="text-align:center;">
-                                <div style="font-family:'Dancing Script', cursive; font-size:1.5rem; border-bottom:1px solid #333; margin-bottom:0.5rem; padding:0 1rem;" id="docSignature">Sarah Smith</div>
+                                <div style="min-height:3.5rem; display:flex; align-items:flex-end; justify-content:center; border-bottom:1px solid #333; margin-bottom:0.4rem; padding:0 1rem;">
+                                    <img id="docSignature" alt="Signature" style="max-height:3rem; max-width:160px; display:none;">
+                                </div>
+                                <div id="docSignatureName" style="font-size:0.85rem; color:#333; font-weight:600;"></div>
                                 <p style="font-size:0.8rem; color:#666;">Electronically Signed</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <button class="btn btn-primary" style="position:absolute; bottom:1rem; right:1rem;" onclick="saveConsultationDocument()">
-                        <i class="fas fa-save"></i> Save & Send
-                    </button>
+
+                    <div style="display:flex; justify-content:center; gap:0.75rem; margin-top:1.25rem; flex-wrap:wrap;">
+                        <button class="btn btn-sm btn-ghost" onclick="openSignatureModal()"><i class="fas fa-pen-nib"></i> Draw Signature</button>
+                        <button class="btn btn-primary btn-sm" onclick="saveConsultationDocument()"><i class="fas fa-save"></i> Save &amp; Send</button>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNATURE MODAL -->
+    <div id="signatureModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="card-header" style="background:var(--em-blue); color:white; border:none;">
+                <span>Digital Signature</span>
+                <button class="btn btn-sm btn-primary" onclick="closeSignatureModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="display:block;">
+                <p style="font-size:0.85rem; color:var(--em-text-muted); margin-bottom:1rem;">Draw your signature below using your mouse, finger, or stylus. It will be placed on all generated documents.</p>
+                <div style="text-align:center;">
+                    <canvas id="signaturePad" class="sig-canvas" width="480" height="200"></canvas>
+                </div>
+                <div style="display:flex; justify-content:center; gap:0.75rem; margin-top:1rem; flex-wrap:wrap;">
+                    <button class="btn btn-ghost btn-sm" onclick="clearSignature()"><i class="fas fa-eraser"></i> Clear</button>
+                    <button class="btn btn-primary btn-sm" onclick="saveSignature()"><i class="fas fa-check"></i> Use Signature</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW DOCUMENT MODAL -->
+    <div id="viewDocModal" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="card-header" style="background:var(--em-blue); color:white; border:none;">
+                <span id="viewDocModalTitle">Document</span>
+                <button class="btn btn-sm btn-primary" onclick="closeViewDoc()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" style="display:block;">
+                <div style="white-space:pre-wrap; font-family:'Times New Roman', serif; font-size:1rem; line-height:1.6; border:1px solid var(--em-border); border-radius:8px; padding:1.5rem; background:white;" id="viewDocContent"></div>
             </div>
         </div>
     </div>
@@ -714,7 +837,7 @@
                 content += 'Refills: 0\n\n';
             }
             if (context) content += 'Notes: ' + context + '\n\n';
-            content += '---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+            content += '---\nPractice Contact (Dr. Samukele Luzulane): 072 973 4610 | 136 2nd St, Randjespark, Midrand, 1685 | PCNS 1339370';
             return content;
         }
 
@@ -728,7 +851,8 @@
             document.getElementById('docHpcsa').textContent = profile.hpcsa_number || "Verified";
             document.getElementById('docPr').textContent = profile.practice_number || "Registered";
             document.getElementById('docHeaderName').textContent = profile.name || '';
-            document.getElementById('docSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+            applySignature(profile.name);
+            document.getElementById('soapFields').classList.toggle('hidden', type !== 'Clinical Note');
             
             notify('Generating ' + type + '...', 'info');
             
@@ -738,19 +862,22 @@
             document.getElementById('docDate').textContent = today;
 
             if (type === 'Sick Note') {
+                lastDocTitle = 'Sick Note';
                 const days = prompt('Number of sick leave days?', '2');
                 const d = parseInt(days) || 2;
                 const unfitEnd = new Date(Date.now() + d * 86400000).toLocaleDateString('en-ZA');
                 const fitDate = new Date(Date.now() + (d + 1) * 86400000).toLocaleDateString('en-ZA');
-                content = 'TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ' + patientName + ' on ' + today + '.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ' + today + ' to ' + unfitEnd + ' inclusive.\n\nThe patient is expected to be fit to resume duties on ' + fitDate + '.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ' + (context || 'Not specified') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                content = 'TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ' + patientName + ' on ' + today + '.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ' + today + ' to ' + unfitEnd + ' inclusive.\n\nThe patient is expected to be fit to resume duties on ' + fitDate + '.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context: ' + (context || 'Not specified') + '\n\n---\nPractice Contact (Dr. Samukele Luzulane): 072 973 4610 | 136 2nd St, Randjespark, Midrand, 1685 | PCNS 1339370';
             } else if (type === 'Prescription') {
+                lastDocTitle = 'Prescription';
                 const meds = getMeds('med-row');
                 content = generatePrescriptionContent(patientName, today, meds, context);
             } else if (type === 'Referral Letter') {
-                content = 'RE: REFERRAL FOR ' + patientName.toUpperCase() + '\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n' + (context || 'The patient presented with symptoms requiring specialist evaluation.') + '\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                lastDocTitle = 'Referral Letter';
+                content = 'RE: REFERRAL FOR ' + patientName.toUpperCase() + '\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n' + (context || 'The patient presented with symptoms requiring specialist evaluation.') + '\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Samukele Luzulane): 072 973 4610 | 136 2nd St, Randjespark, Midrand, 1685 | PCNS 1339370';
             } else if (type === 'Clinical Note') {
-                const noteTitle = prompt('Note title (e.g. SOAP Note, Progress Note):', 'Clinical Note');
-                content = (noteTitle || 'Clinical Note') + '\n\nDate: ' + today + '\nPatient: ' + patientName + '\n\n' + (context || 'No clinical details provided.') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                lastDocTitle = 'Clinical Note';
+                content = buildClinicalNote(patientName, today, context, 'soap');
             }
 
             document.getElementById('documentContent').textContent = content;
@@ -768,7 +895,8 @@
                 document.getElementById('directDocHpcsa').textContent = profile.hpcsa_number || "Verified";
                 document.getElementById('directDocPr').textContent = profile.practice_number || "Registered";
                 document.getElementById('directDocHeaderName').textContent = profile.name || '';
-                document.getElementById('directDocSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+                applySignature(profile.name);
+                document.getElementById('directSoapFields').classList.toggle('hidden', type !== 'Clinical Note');
                 
                 notify('Generating ' + type + '...', 'info');
                 
@@ -778,19 +906,22 @@
                 document.getElementById('directDocDate').textContent = today;
 
                 if (type === 'Sick Note') {
+                    lastDocTitle = 'Sick Note';
                     const days = prompt('Number of sick leave days?', '2');
                     const d = parseInt(days) || 2;
                     const unfitEnd = new Date(Date.now() + d * 86400000).toLocaleDateString('en-ZA');
                     const fitDate = new Date(Date.now() + (d + 1) * 86400000).toLocaleDateString('en-ZA');
-                    content = 'TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ' + patientName + ' on ' + today + '.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ' + today + ' to ' + unfitEnd + ' inclusive.\n\nThe patient is expected to be fit to resume duties on ' + fitDate + '.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context:\n' + (context || 'Not specified.') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                    content = 'TO WHOM IT MAY CONCERN,\n\nThis is to certify that I have examined ' + patientName + ' on ' + today + '.\n\nBased on my clinical findings, it is my professional opinion that the patient is unfit for work/school duties from ' + today + ' to ' + unfitEnd + ' inclusive.\n\nThe patient is expected to be fit to resume duties on ' + fitDate + '.\n\nNature of illness: Medical Condition (Consultation Confidentiality Maintained).\n\nClinical Context:\n' + (context || 'Not specified.') + '\n\n---\nPractice Contact (Dr. Samukele Luzulane): 072 973 4610 | 136 2nd St, Randjespark, Midrand, 1685 | PCNS 1339370';
                 } else if (type === 'Prescription') {
+                    lastDocTitle = 'Prescription';
                     const meds = getMeds('direct-med-row');
                     content = generatePrescriptionContent(patientName, today, meds, context);
                 } else if (type === 'Referral Letter') {
-                    content = 'RE: REFERRAL FOR ' + patientName.toUpperCase() + '\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n' + (context || 'The patient presented with symptoms requiring specialist evaluation.') + '\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                    lastDocTitle = 'Referral Letter';
+                    content = 'RE: REFERRAL FOR ' + patientName.toUpperCase() + '\n\nDear Colleague,\n\nI am referring this patient to your specialized care for further evaluation and management.\n\nSummary of Findings:\n' + (context || 'The patient presented with symptoms requiring specialist evaluation.') + '\n\nThank you for your assistance in the ongoing care of this patient.\n\n---\nPractice Contact (Dr. Samukele Luzulane): 072 973 4610 | 136 2nd St, Randjespark, Midrand, 1685 | PCNS 1339370';
                 } else if (type === 'Clinical Note') {
-                    const noteTitle = prompt('Note title (e.g. SOAP Note, Progress Note):', 'Clinical Note');
-                    content = (noteTitle || 'Clinical Note') + '\n\nDate: ' + today + '\nPatient: ' + patientName + '\n\n' + (context || 'No clinical details provided.') + '\n\n---\nPractice Contact (Dr. Sam): 072 973 4610 | Doctorsonwheels@outlook.com';
+                    lastDocTitle = 'Clinical Note';
+                    content = buildClinicalNote(patientName, today, context, 'directSoap');
                 }
 
                 document.getElementById('directDocumentContent').textContent = content;
@@ -818,7 +949,7 @@
 
                 document.getElementById('displayDocName').textContent = profile.name || '';
                 document.getElementById('docHeaderName').textContent = profile.name || '';
-                document.getElementById('docSignature').textContent = profile.name ? profile.name.split(' ').slice(-1)[0] : '';
+                applySignature(profile.name);
                 document.getElementById('docSpecialty').textContent = profile.specialty || 'Medical Practitioner';
                 document.getElementById('docHpcsa').textContent = profile.hpcsa_number || 'Verified';
                 document.getElementById('docPr').textContent = profile.practice_number || 'Registered';
@@ -876,6 +1007,165 @@
             setTimeout(() => t.remove(), 3000);
         }
 
+        let lastDocTitle = null;
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/[&<>"']/g, function(c) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            });
+        }
+
+        function applySignature(name) {
+            const sig = localStorage.getItem('dow_signature_png');
+            const img = document.getElementById('docSignature');
+            const imgDirect = document.getElementById('directDocSignature');
+            if (img) {
+                if (sig) { img.src = sig; img.style.display = 'inline-block'; }
+                else { img.style.display = 'none'; }
+            }
+            if (imgDirect) {
+                if (sig) { imgDirect.src = sig; imgDirect.style.display = 'inline-block'; }
+                else { imgDirect.style.display = 'none'; }
+            }
+            const n = document.getElementById('docSignatureName');
+            const nd = document.getElementById('directDocSignatureName');
+            if (n) n.textContent = name || '';
+            if (nd) nd.textContent = name || '';
+        }
+
+        let sigPadInited = false;
+        function initSignaturePad() {
+            const canvas = document.getElementById('signaturePad');
+            if (!canvas || sigPadInited) return;
+            sigPadInited = true;
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) { sigPadInited = false; return; }
+            canvas.width = Math.floor(rect.width * dpr);
+            canvas.height = Math.floor(rect.height * dpr);
+            ctx.scale(dpr, dpr);
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            let drawing = false;
+            function pos(e) {
+                const r = canvas.getBoundingClientRect();
+                const pt = (e.touches && e.touches[0]) || e;
+                return { x: pt.clientX - r.left, y: pt.clientY - r.top };
+            }
+            function down(e) { e.preventDefault(); drawing = true; const p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }
+            function move(e) { if (!drawing) return; e.preventDefault(); const p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); }
+            function up() { drawing = false; ctx.beginPath(); }
+            canvas.addEventListener('mousedown', down);
+            canvas.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', up);
+            canvas.addEventListener('touchstart', down, { passive: false });
+            canvas.addEventListener('touchmove', move, { passive: false });
+            canvas.addEventListener('touchend', up);
+        }
+
+        function openSignatureModal() {
+            document.getElementById('signatureModal').classList.remove('hidden');
+            setTimeout(initSignaturePad, 60);
+        }
+
+        function closeSignatureModal() { document.getElementById('signatureModal').classList.add('hidden'); }
+
+        function clearSignature() {
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveSignature() {
+            const canvas = document.getElementById('signaturePad');
+            const ctx = canvas.getContext('2d');
+            let hasInk = false;
+            try {
+                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                for (let i = 3; i < imgData.data.length; i += 4) {
+                    if (imgData.data[i] > 0) { hasInk = true; break; }
+                }
+            } catch (e) { hasInk = true; }
+            if (!hasInk) { notify('Please draw a signature first', 'error'); return; }
+            const sig = canvas.toDataURL('image/png');
+            localStorage.setItem('dow_signature_png', sig);
+            const name = document.getElementById('docHeaderName').textContent || document.getElementById('directDocHeaderName').textContent || '';
+            applySignature(name);
+            closeSignatureModal();
+            notify('Signature saved', 'success');
+            apiCall('/api/profile/doctor/signature', { method: 'PUT', body: JSON.stringify({ signature: sig }) }).catch(() => {});
+        }
+
+        function buildClinicalNote(patientName, today, context, prefix) {
+            const get = function(id) { const el = document.getElementById(prefix + id); return el ? el.value.trim() : ''; };
+            const subjective = get('Subjective') || context || 'Not specified.';
+            const objective = get('Objective') || 'Clinical findings to be documented.';
+            const assessment = get('Assessment') || 'Assessment to be documented.';
+            const plan = get('Plan') || 'Management plan to be documented.';
+            return 'CLINICAL NOTE\n\nPatient: ' + patientName + '\nDate: ' + today + '\n\n' +
+                'SUBJECTIVE (History):\n' + subjective + '\n\n' +
+                'OBJECTIVE (Examination & Findings):\n' + objective + '\n\n' +
+                'ASSESSMENT (Diagnosis):\n' + assessment + '\n\n' +
+                'PLAN (Management & Follow-up):\n' + plan + '\n\n' +
+                '---\nPractice Contact (Dr. Samukele Luzulane): 072 973 4610 | 136 2nd St, Randjespark, Midrand, 1685 | PCNS 1339370';
+        }
+
+        let savedDocsItems = [];
+        async function loadSavedDocs(type) {
+            document.querySelectorAll('.doc-tab').forEach(function(b) {
+                const active = (b.dataset.type || '') === (type || '');
+                b.classList.toggle('btn-primary', active);
+                b.classList.toggle('btn-ghost', !active);
+                b.classList.toggle('active', active);
+            });
+            const container = document.getElementById('savedDocsList');
+            if (!container) return;
+            container.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--em-text-muted);">Loading...</div>';
+            try {
+                const query = type ? '?type=' + encodeURIComponent(type) : '';
+                const records = await apiCall('/api/records' + query);
+                let pres = [];
+                if (!type || type === 'Prescription') {
+                    try { pres = await apiCall('/api/prescriptions'); } catch (e) {}
+                }
+                const recordItems = records.map(function(r) {
+                    return { type: r.type || 'Record', title: r.title || r.type || 'Record', date: r.created_at || Date.now(), summary: r.summary || '' };
+                });
+                const presItems = pres.map(function(p) {
+                    return { type: 'Prescription', title: 'Prescription', date: p.created_at || Date.now(), summary: p.instructions || '' };
+                });
+                const items = recordItems.concat(presItems);
+                items.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+                savedDocsItems = items;
+                if (!items.length) { container.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--em-text-muted);">No saved documents found.</div>'; return; }
+                container.innerHTML = items.map(function(d, i) {
+                    return '<div style="border:1px solid var(--em-border); border-radius:8px; padding:1rem 1.25rem; margin-bottom:0.75rem; display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">' +
+                        '<div style="flex:1; min-width:200px;">' +
+                            '<div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem; flex-wrap:wrap;"><span class="script-badge">' + escapeHtml(d.type) + '</span><strong>' + escapeHtml(d.title) + '</strong></div>' +
+                            '<p style="font-size:0.8rem; color:var(--em-text-muted); margin:0;">' + new Date(d.date).toLocaleDateString('en-ZA') + '</p>' +
+                            '<p style="font-size:0.85rem; margin:0.5rem 0 0; white-space:pre-wrap; max-height:4rem; overflow:hidden;">' + escapeHtml(d.summary.slice(0, 280)) + '</p>' +
+                        '</div>' +
+                        '<button class="btn btn-sm btn-ghost" onclick="viewSavedDoc(' + i + ')"><i class="fas fa-eye"></i> View</button>' +
+                    '</div>';
+                }).join('');
+            } catch (e) {
+                container.innerHTML = '<div style="padding:2rem; text-align:center; color:var(--em-danger);">Failed to load documents: ' + escapeHtml(e.message) + '</div>';
+            }
+        }
+
+        function viewSavedDoc(i) {
+            const d = savedDocsItems[i];
+            if (!d) return;
+            document.getElementById('viewDocModalTitle').textContent = (d.type || 'Document') + ' - ' + (d.title || '');
+            document.getElementById('viewDocContent').textContent = d.summary || '';
+            document.getElementById('viewDocModal').classList.remove('hidden');
+        }
+
+        function closeViewDoc() { document.getElementById('viewDocModal').classList.add('hidden'); }
+
         async function saveConsultationDocument() {
             const type = document.getElementById('docTitle').textContent;
             const content = document.getElementById('documentContent').textContent;
@@ -897,7 +1187,9 @@
                             doctor_id: appt.doctor_id,
                             medication: 'Prescription',
                             dosage: 'As per instructions',
-                            instructions: content
+                            instructions: content,
+                            type: 'Prescription',
+                            title: 'Prescription'
                         })
                     });
                 } else {
@@ -907,7 +1199,9 @@
                             appointment_id: appt.id,
                             patient_id: appt.patient_id,
                             doctor_id: appt.doctor_id,
-                            summary: content
+                            summary: content,
+                            type: type,
+                            title: lastDocTitle || type
                         })
                     });
                 }
@@ -941,7 +1235,9 @@
                             doctor_id: profile.id,
                             medication: 'Prescription',
                             dosage: 'As per instructions',
-                            instructions: content
+                            instructions: content,
+                            type: 'Prescription',
+                            title: 'Prescription'
                         })
                     });
                 } else {
@@ -951,7 +1247,9 @@
                             appointment_id: null,
                             patient_id: Number(patientId),
                             doctor_id: profile.id,
-                            summary: content
+                            summary: content,
+                            type: type,
+                            title: lastDocTitle || type
                         })
                     });
                 }
@@ -1055,6 +1353,7 @@
             if (t === 'scripts') loadScripts();
             if (t === 'patients') loadPatients();
             if (t === 'make-notes') populatePatientDropdown();
+            if (t === 'records') loadSavedDocs('');
             if (window.innerWidth <= 768) closeMobileMenu();
         }
 
