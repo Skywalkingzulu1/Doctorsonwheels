@@ -249,15 +249,21 @@
         window.onload = () => {
             const userData = JSON.parse(localStorage.getItem('user') || '{}');
             if (userData.name) document.querySelector('[name="full_name"]').value = userData.name;
-            
+
             if (!authToken) {
                 alert('Please login to submit this form.');
                 window.location.href = 'login.html';
                 return;
             }
 
+            if (!appointmentId) {
+                alert('No appointment is linked to this questionnaire, so it cannot be saved. Please open it from your appointment list.');
+                window.location.href = returnUrl;
+                return;
+            }
+
             const hasDraft = sessionStorage.getItem(SESSION_FORM_KEY);
-            if (hasDraft && !appointmentId) {
+            if (hasDraft) {
                 const confirmed = confirm('You have a saved questionnaire draft. Would you like to resume it?');
                 if (confirmed) {
                     restoreDraft();
@@ -285,9 +291,10 @@
             });
 
             if (!appointmentId) {
-                alert('No appointment ID found. Saving to session instead.');
                 sessionStorage.setItem('patient_questionnaire', JSON.stringify(data));
-                window.location.href = returnUrl;
+                alert('No appointment is linked to this questionnaire, so it was NOT saved. Please reopen it from your appointment list.');
+                btn.disabled = false;
+                btn.textContent = 'Submit Information';
                 return;
             }
 
@@ -301,8 +308,13 @@
                     body: JSON.stringify(data)
                 });
 
-                if (!response.ok) throw new Error('Failed to submit questionnaire');
-                
+                if (!response.ok) {
+                    let detail = 'Failed to submit questionnaire';
+                    try { detail = (await response.json()).detail || detail; } catch (e) {}
+                    throw new Error(detail);
+                }
+
+                clearDraft();
                 alert('Information submitted successfully! Your doctor will review this before the call.');
                 window.location.href = returnUrl;
             } catch (e) {
@@ -315,15 +327,6 @@
         document.getElementById('btnCancel').addEventListener('click', () => {
             window.location.href = returnUrl;
         });
-        
-        window.onload = () => {
-            const userData = JSON.parse(localStorage.getItem('user') || '{}');
-            if (userData.name) document.querySelector('[name="full_name"]').value = userData.name;
-            if (!authToken) {
-                alert('Please login to submit this form.');
-                window.location.href = 'login.html';
-            }
-        };
     </script>
 </body>
 </html>

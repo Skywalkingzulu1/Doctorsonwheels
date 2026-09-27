@@ -342,6 +342,9 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                     price_credits: a.price_credits,
                     payment_method: a.payment_method,
                     escrow_status: a.escrow_status,
+                    location: a.location,
+                    triage_data: a.triage_data,
+                    triage_tools_results: a.triage_tools_results,
                     doctor_name: a.Doctors?.name || 'Dr. Sam',
                     patient_name: a.Profiles?.name || 'Patient'
                 }));
@@ -418,6 +421,46 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                 const { error } = await supabase.from('appointments').update({ status: 'COMPLETED' }).eq('id', apptId);
                 if (error) throw new Error(error.message);
                 return new Response(JSON.stringify({ status: 'success' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+            }
+
+            if (path.startsWith('/api/appointments/') && path.endsWith('/questionnaire') && method === 'POST') {
+                const emulatedEmail = localStorage.getItem('emulated_user_email');
+                if (!emulatedEmail) throw new Error('Not authenticated');
+
+                const apptId = path.split('/')[3];
+                const body = JSON.parse(init.body);
+
+                const { data: profile } = await supabase.from('Profiles').select('id, role').eq('email', emulatedEmail).single();
+                if (!profile) throw new Error('Profile not found');
+
+                const { data: appt, error: apptErr } = await supabase
+                    .from('appointments')
+                    .select('id, patient_id, triage_data')
+                    .eq('id', apptId)
+                    .single();
+                if (apptErr) throw new Error(apptErr.message);
+                if (!appt) throw new Error('Appointment not found');
+
+                if (profile.role !== 'DOCTOR' && appt.patient_id !== profile.id) {
+                    throw new Error('Not authorised for this appointment');
+                }
+
+                let triage = {};
+                if (appt.triage_data) {
+                    try { triage = JSON.parse(appt.triage_data) || {}; }
+                    catch (e) { triage = {}; }
+                }
+
+                triage.questionnaire = { ...(triage.questionnaire || {}), ...body };
+                triage.questionnaire_submitted_at = new Date().toISOString();
+
+                const { error: updErr } = await supabase
+                    .from('appointments')
+                    .update({ triage_data: JSON.stringify(triage) })
+                    .eq('id', apptId);
+                if (updErr) throw new Error(updErr.message);
+
+                return new Response(JSON.stringify({ status: 'success', appointment_id: apptId }), { status: 200, headers: { 'Content-Type': 'application/json' } });
             }
 
             // --- RECORDS & PRESCRIPTIONS ---
