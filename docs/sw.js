@@ -1,4 +1,4 @@
-const CACHE_NAME = 'dow-v3';
+const CACHE_NAME = 'dow-v4';
 const STATIC_ASSETS = [
     '/',
     '/index.html',

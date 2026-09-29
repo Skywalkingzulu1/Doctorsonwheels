@@ -180,6 +180,21 @@
     .success i{font-size:2.5rem;color:var(--accent);display:block;margin-bottom:.75rem}
     .success h3{font-size:1.1rem;font-weight:800;margin-bottom:.5rem}
     .success p{font-size:.88rem;color:var(--text-light)}
+    .field-error{font-size:.78rem;color:var(--danger);margin-top:.3rem;display:none}
+    .field-error.show{display:block}
+    .field-msg{font-size:.78rem;margin-top:.35rem;display:none;gap:.3rem;align-items:flex-start;line-height:1.45}
+    .field-msg.show{display:flex}
+    .field-msg.ok{color:#1a7f4b}
+    .field-msg.warn{color:#8a5a00}
+    .field-msg.bad{color:var(--danger)}
+    .form-file{width:100%;padding:.5rem;border:1px dashed var(--border);border-radius:8px;font-size:.82rem;font-family:inherit;background:var(--white);color:var(--text)}
+    .form-file:hover,.form-file:focus{border-color:var(--primary);outline:none}
+    .form-file.done{border-style:solid;border-color:var(--accent);color:#1a7f4b}
+    .doc-row{margin-bottom:.9rem}
+    .doc-row .fname{display:block;font-weight:600;font-size:.82rem;margin-bottom:.3rem}
+    .step-note{font-size:.8rem;color:var(--text-light);line-height:1.55;margin-bottom:1.1rem}
+    .btn-ghost{display:block;width:100%;margin-top:.6rem;padding:.7rem;background:none;border:1px solid var(--border);border-radius:10px;font-size:.85rem;font-weight:600;color:var(--text-light);cursor:pointer;font-family:inherit}
+    .btn-ghost:hover{border-color:var(--primary);color:var(--primary)}
 
     /* ===== FAQ ===== */
     details{border-bottom:1px solid var(--border);padding:.9rem 0}
@@ -400,6 +415,7 @@
             <div class="form-group">
                 <label class="form-label" for="f-npi">NPI number <span class="req">*</span></label>
                 <input type="text" id="f-npi" class="form-input" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" placeholder="10 digits" required title="NPI is a 10-digit number">
+                <p class="field-msg" id="npiMsg"></p>
                 <p style="font-size:.76rem;color:var(--text-light);margin-top:.3rem">We verify this against the NPPES registry, so please check it before submitting.</p>
             </div>
 
@@ -443,18 +459,42 @@
                 <span>I confirm the information above is accurate, that my license and NPI are in good standing, and that I understand this is an independent contractor opportunity and not an offer of employment.</span>
             </label>
 
+            <p class="field-msg bad" id="formError"></p>
+
             <button type="submit" class="btn-submit" id="submitBtn">Submit application</button>
         </form>
 
         <div class="secure-note">
-            <i class="fas fa-lock"></i>Your malpractice certificate of insurance and license documentation are <strong>not</strong> uploaded on this page. Once we have reviewed your application we send a separate secure link for those documents, so your credentialing files are not sitting in a public web folder.
+            <i class="fas fa-lock"></i>Your documents are uploaded straight to a private, non-public storage bucket over an encrypted connection. They are never posted to a public web folder, and nobody outside credentialing can open them.
         </div>
+    </div>
+
+    <div id="docView" style="display:none">
+        <h2>One last step</h2>
+        <p class="step-note" id="docIntro">Your application is recorded. If you can add your documents now it saves a round of email. You can also skip this and send them later &mdash; your application is already in the queue.</p>
+
+        <div class="doc-row">
+            <label class="fname" for="f-coi">Certificate of insurance <span class="req">*</span></label>
+            <input type="file" id="f-coi" class="form-file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp">
+            <p class="field-msg" id="coiMsg"></p>
+        </div>
+
+        <div class="doc-row">
+            <label class="fname" for="f-license">State licence or registration <span class="opt">(optional)</span></label>
+            <input type="file" id="f-license" class="form-file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp">
+            <p class="field-msg" id="licMsg"></p>
+        </div>
+
+        <p class="field-msg bad" id="docError"></p>
+
+        <button type="button" class="btn-submit" id="uploadBtn">Upload documents</button>
+        <button type="button" class="btn-ghost" id="skipDocs">Skip for now, I will email them</button>
     </div>
 
     <div class="success" id="successView">
         <i class="fas fa-circle-check"></i>
         <h3>Application received</h3>
-        <p>Our credentialing team will review your NPI and license states and be in touch. If you applied for behavioral health, we will send that rate card instead of the E/M one.</p>
+        <p id="successDetail">Our credentialing team will review your NPI and license states and be in touch.</p>
         <p style="margin-top:1rem"><a href="/" style="color:var(--primary);font-weight:600">Back to the platform</a></p>
     </div>
 </aside>
@@ -497,43 +537,214 @@
     </div>
 </footer>
 
-<script src="cloudinary_upload.js"></script>
 <script>
-document.getElementById('usApplication').addEventListener('submit', async function (e) {
-    e.preventDefault();
+(function () {
+    'use strict';
 
-    var btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting...';
+    // The clinician-intake Edge Function. verify_jwt is off there on purpose
+    // (applicants are anonymous), so the protection is that the function only
+    // ever writes to clinician_applications and the private
+    // clinician-credentials bucket, and its CORS allowlist is this origin only.
+    var INTAKE_URL = 'https://jvsfhrekkkhijneqngax.supabase.co/functions/v1/clinician-intake';
+    var MAX_BYTES = 10 * 1024 * 1024;
+    var FALLBACK = 'Please try again, or email Doctorsonwheels@outlook.com quoting your name and NPI.';
 
-    var payload = {
-        source: 'us_careers_page',
-        role: 'US_CLINICIAN',
-        market: 'United States',
-        name: document.getElementById('f-name').value.trim(),
-        email: document.getElementById('f-email').value.trim(),
-        phone: document.getElementById('f-phone').value.trim(),
-        specialty: document.getElementById('f-specialty').value,
-        license_state_primary: document.getElementById('f-state').value.trim(),
-        license_states_additional: document.getElementById('f-states').value.trim(),
-        npi: document.getElementById('f-npi').value.trim(),
-        malpractice_coverage: document.getElementById('f-malpractice').value,
-        visits_per_week: document.getElementById('f-visits').value,
-        notes: document.getElementById('f-notes').value.trim(),
-        attestation: document.getElementById('f-attest').checked
-    };
+    function $(id) { return document.getElementById(id); }
 
-    try {
-        await CloudinaryUploader.uploadToCloudinary(payload, 'US_CLINICIAN', payload.email);
-        document.getElementById('formView').style.display = 'none';
-        document.getElementById('successView').style.display = 'block';
-    } catch (error) {
-        console.error('Application submission error:', error);
-        alert('Something went wrong submitting your application. Please try again, or email us at Doctorsonwheels@outlook.com quoting your name and NPI.');
-        btn.disabled = false;
-        btn.textContent = 'Submit application';
+    function setMsg(el, kind, text) {
+        el.className = 'field-msg' + (text ? ' show' : '') + (kind ? ' ' + kind : '');
+        // textContent, never innerHTML: registry_name comes from a third party.
+        el.textContent = text || '';
     }
-});
+
+    async function callIntake(action, opts) {
+        var url = INTAKE_URL + '?action=' + encodeURIComponent(action);
+        var init = { method: 'POST' };
+        if (opts && opts.query) url += '&' + opts.query;
+        if (opts && opts.json) {
+            init.headers = { 'Content-Type': 'application/json' };
+            init.body = JSON.stringify(opts.json);
+        } else if (opts && opts.blob) {
+            init.body = opts.blob;
+        }
+        var res = await fetch(url, init);
+        var data = {};
+        try { data = await res.json(); } catch (e) { /* non-JSON error page */ }
+        return { status: res.status, data: data };
+    }
+
+    // ---------- NPI check on blur ----------
+
+    $('f-npi').addEventListener('input', function () {
+        setMsg($('npiMsg'), '', '');
+    });
+
+    $('f-npi').addEventListener('blur', function () {
+        var val = $('f-npi').value.replace(/\D/g, '');
+        var msg = $('npiMsg');
+        if (val.length !== 10) return;
+
+        setMsg(msg, 'warn', 'Checking the NPPES registry...');
+        callIntake('verify-npi', { query: 'npi=' + val }).then(function (r) {
+            if (r.status !== 200 || !r.data || typeof r.data.checksum_ok === 'undefined') {
+                setMsg(msg, 'warn', 'We could not reach the registry just now. You can still submit and we will confirm manually.');
+                return;
+            }
+            var d = r.data;
+            if (d.valid) {
+                setMsg(msg, 'ok', 'Found in NPPES' +
+                    (d.registry_name ? ': ' + d.registry_name : '') +
+                    (d.registry_taxonomy ? ' (' + d.registry_taxonomy + ')' : '') +
+                    '. We still verify your licence and identity separately.');
+            } else if (d.checksum_ok === false) {
+                setMsg(msg, 'bad', d.error || 'That NPI fails its checksum. Please check the digits.');
+            } else {
+                setMsg(msg, 'bad', 'That NPI is not active in the NPPES registry. You can still apply and we will follow up.');
+            }
+        }).catch(function () {
+            setMsg(msg, 'warn', 'We could not reach the registry just now. You can still submit and we will confirm manually.');
+        });
+    });
+
+    // ---------- step 1: application ----------
+
+    var currentAppId = null;
+
+    $('usApplication').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        var btn = $('submitBtn');
+        var err = $('formError');
+        btn.disabled = true;
+        btn.textContent = 'Submitting...';
+        setMsg(err, 'bad', '');
+
+        var payload = {
+            name: $('f-name').value.trim(),
+            email: $('f-email').value.trim(),
+            phone: $('f-phone').value.trim(),
+            specialty: $('f-specialty').value,
+            license_state_primary: $('f-state').value.trim(),
+            license_states_additional: $('f-states').value.trim(),
+            npi: $('f-npi').value.replace(/\D/g, ''),
+            malpractice_coverage: $('f-malpractice').value,
+            visits_per_week: $('f-visits').value,
+            notes: $('f-notes').value.trim(),
+            posting_version: '2026-09-29'
+        };
+
+        try {
+            var r = await callIntake('submit', { json: payload });
+
+            if (r.status === 429) {
+                setMsg(err, 'bad', 'Too many applications from this network. Please email us instead.');
+                btn.disabled = false;
+                btn.textContent = 'Submit application';
+                return;
+            }
+            if (!r.data || !r.data.ok) {
+                setMsg(err, 'bad', (r.data && r.data.error) || ('Something went wrong. ' + FALLBACK));
+                btn.disabled = false;
+                btn.textContent = 'Submit application';
+                return;
+            }
+
+            currentAppId = r.data.application_id;
+
+            if (!r.data.npi_verified) {
+                $('docIntro').textContent = 'Your application is recorded, but we could not find that NPI in the NPPES registry, so a credentialing specialist will confirm it with you. If you can add your documents now it saves a round of email.';
+            }
+
+            $('formView').style.display = 'none';
+            $('docView').style.display = 'block';
+        } catch (err2) {
+            setMsg(err, 'bad', 'We could not reach the application service. ' + FALLBACK);
+            btn.disabled = false;
+            btn.textContent = 'Submit application';
+        }
+    });
+
+    // ---------- step 2: documents ----------
+
+    function checkLocal(file) {
+        if (file.size === 0) return 'That file is empty.';
+        if (file.size > MAX_BYTES) return 'That file is larger than 10 MB.';
+        return null;
+    }
+
+    function finish(detail) {
+        $('docView').style.display = 'none';
+        $('successDetail').textContent = detail;
+        $('successView').style.display = 'block';
+        $('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    $('uploadBtn').addEventListener('click', async function () {
+        var coi = $('f-coi').files[0];
+        var lic = $('f-license').files[0];
+        var coiMsg = $('coiMsg');
+        var licMsg = $('licMsg');
+        var err = $('docError');
+        var btn = this;
+
+        setMsg(err, 'bad', '');
+        setMsg(coiMsg, '', '');
+        setMsg(licMsg, '', '');
+
+        if (!coi) {
+            setMsg(coiMsg, 'bad', 'Please attach your certificate of insurance, or use the skip button below.');
+            coi.focus();
+            return;
+        }
+
+        var problem = checkLocal(coi);
+        if (problem) { setMsg(coiMsg, 'bad', problem); return; }
+        if (lic) {
+            problem = checkLocal(lic);
+            if (problem) { setMsg(licMsg, 'bad', problem); return; }
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Uploading...';
+
+        var jobs = [{ file: coi, kind: 'coi', input: $('f-coi'), msg: coiMsg }];
+        if (lic) jobs.push({ file: lic, kind: 'license', input: $('f-license'), msg: licMsg });
+
+        var failed = false;
+        for (var i = 0; i < jobs.length; i++) {
+            var j = jobs[i];
+            setMsg(j.msg, 'warn', 'Uploading...');
+            try {
+                var r = await callIntake('upload', {
+                    query: 'application_id=' + encodeURIComponent(currentAppId) + '&doc_kind=' + j.kind,
+                    blob: j.file
+                });
+                if (r.status === 200 && r.data && r.data.ok) {
+                    j.input.classList.add('done');
+                    setMsg(j.msg, 'ok', 'Stored privately (' + Math.round(r.data.size / 1024) + ' KB).');
+                } else {
+                    failed = true;
+                    setMsg(j.msg, 'bad', (r.data && r.data.error) || 'Upload failed. ' + FALLBACK);
+                }
+            } catch (e) {
+                failed = true;
+                setMsg(j.msg, 'bad', 'Upload failed. ' + FALLBACK);
+            }
+        }
+
+        if (failed) {
+            btn.disabled = false;
+            btn.textContent = 'Try the upload again';
+            return;
+        }
+
+        finish('Thank you. We have your application and your documents. Credentialing will review your NPI, licence and coverage, then be in touch by email.');
+    });
+
+    $('skipDocs').addEventListener('click', function () {
+        finish('Your application is in the queue. Email your certificate of insurance and licence to Doctorsonwheels@outlook.com with your name and NPI, and we will attach them to your file.');
+    });
+})();
 </script>
 
 </body>
