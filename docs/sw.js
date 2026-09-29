@@ -1,7 +1,8 @@
-const CACHE_NAME = 'dow-v2';
+const CACHE_NAME = 'dow-v3';
 const STATIC_ASSETS = [
     '/',
     '/index.html',
+    '/us-careers.html',
     '/manifest.json',
     '/icon-192.png',
     '/icon-512.png',

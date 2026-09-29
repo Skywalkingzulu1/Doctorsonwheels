@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Administrative and internal tooling: no search value, and several of these
+# pages are reachable without a session check. Keep them out of the index.
+Disallow: /admin_dashboard.html
+Disallow: /admin_live.html
+Disallow: /deploy.html
+Disallow: /test.html
+Disallow: /test2.html
+Disallow: /room.html
+
+Sitemap: https://docsonwheels.co.za/sitemap.xml
