@@ -8,3 +8,9 @@ trash/
 
 # Supabase local CLI state (project links, versions)
 supabase/.temp/
+
+# Generated clinical documents (sick notes, prescriptions, letters).
+# These contain real patient PHI and must never be committed. Note that
+# docs/ is the GitHub Pages source directory, so anything committed here
+# is published to docsonwheels.co.za.
+docs/generated/
