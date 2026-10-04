@@ -39,6 +39,7 @@
     <meta name="theme-color" content="#0052cc">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/si-widget.css">
     <style>
         :root {
             --primary: #0052cc;
@@ -469,6 +470,9 @@
             <a href="patient_dashboard.html" class="btn btn-hero-primary"><i class="fas fa-user-md"></i> Find a Doctor</a>
             <a href="register.html" class="btn btn-hero-secondary"><i class="fas fa-stethoscope"></i> Join as a Doctor</a>
         </div>
+        <div class="hero-alt">
+            <a class="hero-link" data-si-open href="https://skywalkingzulu1.github.io/sandton-index/search/"><i class="fas fa-house-medical"></i> Clinics &amp; pharmacies near you in Sandton</a>
+        </div>
         <div class="hero-trust">
             <div class="hero-trust-item"><i class="fas fa-shield-halved"></i> HPCSA Verified</div>
             <div class="hero-trust-item"><i class="fas fa-lock"></i> Secure &amp; Private</div>
@@ -635,6 +639,7 @@
             <a href="doctor_dashboard.html">Doctor Portal</a>
             <a href="about.html">About Us</a>
             <a href="sandton.html">Online doctor in Sandton</a>
+            <a href="https://skywalkingzulu1.github.io/sandton-index/search/" data-si-open>Clinics &amp; pharmacies near you</a>
         </div>
         <div class="footer-col">
             <h4>Careers</h4>
@@ -734,6 +739,7 @@ if ('serviceWorker' in navigator) {
     });
 }
 </script>
+<script defer src="assets/si-widget.js"></script>
 
 </body>
 </html>

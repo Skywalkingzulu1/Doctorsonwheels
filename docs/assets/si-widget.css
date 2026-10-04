@@ -1,0 +1,167 @@
+/* Sandton Index side-service widget. All classes prefixed si- to avoid
+   collisions with page styles. */
+.si-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 23, 42, .55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8vh 1rem 1rem;
+}
+.si-overlay[hidden] { display: none; }
+.si-panel {
+  background: #fff;
+  color: #1e293b;
+  width: 100%;
+  max-width: 580px;
+  max-height: 82vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .35);
+  padding: 1.5rem;
+  font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+}
+.si-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.si-head h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+.si-sub { color: #64748b; font-size: .85rem; margin: .15rem 0 0; }
+.si-close {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #1e293b;
+  flex-shrink: 0;
+}
+.si-close:hover { background: #e2e8f0; }
+.si-close:focus-visible,
+.si-item:focus-visible,
+.si-chip:focus-visible,
+.si-go:focus-visible,
+.si-input:focus-visible {
+  outline: 3px solid #0052cc;
+  outline-offset: 2px;
+}
+.si-form { display: flex; gap: .5rem; margin-top: 1rem; }
+.si-input {
+  flex: 1;
+  padding: .7rem .9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-family: inherit;
+  min-width: 0;
+}
+.si-go {
+  background: #0052cc;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .7rem 1.2rem;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+.si-go:hover { background: #0747a6; }
+.si-chips { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .75rem; }
+.si-chip {
+  background: #eef4ff;
+  color: #0052cc;
+  border: 1px solid #c7d7f8;
+  border-radius: 999px;
+  padding: .35rem .9rem;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.si-chip:hover { background: #dbe7fd; }
+.si-toggle {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .75rem;
+  font-size: .85rem;
+  color: #475569;
+  cursor: pointer;
+}
+.si-toggle input { width: 1rem; height: 1rem; accent-color: #0052cc; }
+.si-health { cursor: pointer; }
+.si-full { font-weight: 700; text-decoration: none; }
+.si-full:hover { text-decoration: underline; }
+.si-results { margin-top: 1rem; display: flex; flex-direction: column; gap: .4rem; }
+.si-item {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  padding: .65rem .8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.si-item:hover { border-color: #0052cc; background: #f8faff; }
+.si-name { font-weight: 700; font-size: .95rem; }
+.si-name mark { background: #fef08a; border-radius: 2px; padding: 0 1px; }
+.si-meta { font-size: .8rem; color: #64748b; }
+.si-empty, .si-hint { color: #64748b; font-size: .9rem; padding: .5rem 0; }
+.si-empty a, .si-foot a, .si-hint a { color: #0052cc; }
+.si-foot {
+  margin-top: 1rem;
+  padding-top: .75rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: .78rem;
+  color: #94a3b8;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+/* tertiary hero trigger lives on the host page, styled here so the
+   button looks intentional before any interaction */
+.hero-alt { margin-top: 1.25rem; animation: fadeInUp .8s ease .6s both; }
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  color: rgba(255, 255, 255, .85);
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(255, 255, 255, .4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: .25rem 0;
+}
+.hero-link:hover { color: #fff; text-decoration-color: #fff; }
+.hero-link:focus-visible { outline: 3px solid #fff; outline-offset: 3px; border-radius: 4px; }
+@media (max-width: 640px) {
+  .si-overlay { align-items: flex-end; padding: 0; }
+  .si-panel {
+    max-width: none;
+    max-height: 88vh;
+    border-radius: 18px 18px 0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .si-overlay *, .hero-alt { animation: none !important; transition: none !important; }
+}
