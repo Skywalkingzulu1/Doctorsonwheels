@@ -12,23 +12,75 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doctors on Wheels — Healthcare, On Your Terms</title>
-    <meta name="description" content="South Africa's on-demand healthcare platform. Connect with verified doctors via video, chat, or home visits.">
+    <title>Doctors on Wheels | Online Doctor Consultations in SA</title>
+    <meta name="description" content="Consult HPCSA-verified doctors by secure video or request a home visit anywhere in South Africa. Transparent pricing, digital prescriptions, 24/7 booking.">
     <link rel="canonical" href="https://docsonwheels.co.za/">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="en_ZA">
     <meta property="og:site_name" content="Doctors on Wheels">
-    <meta property="og:title" content="Doctors on Wheels — Healthcare, On Your Terms">
+    <meta property="og:title" content="Doctors on Wheels | Online Doctor Consultations in SA">
     <meta property="og:description" content="Connect with verified doctors via secure video, chat, or in-person home visits.">
     <meta property="og:url" content="https://docsonwheels.co.za/">
     <meta name="twitter:card" content="summary_large_image">
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Doctors on Wheels",
-      "url": "https://docsonwheels.co.za/",
-      "logo": "https://docsonwheels.co.za/logo.jpeg"
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "Doctors on Wheels",
+          "url": "https://docsonwheels.co.za/",
+          "logo": "https://docsonwheels.co.za/logo.jpeg"
+        },
+        {
+          "@type": "Physician",
+          "name": "Dr Samukele Luzulane",
+          "jobTitle": "Co-Founder & Medical Director",
+          "telephone": "+27 72 973 4610",
+          "url": "https://docsonwheels.co.za/",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "136 2nd St, Randjespark",
+            "addressLocality": "Midrand",
+            "postalCode": "1685",
+            "addressCountry": "ZA"
+          }
+        },
+        {
+          "@type": "MedicalClinic",
+          "name": "Doctors on Wheels",
+          "url": "https://docsonwheels.co.za/",
+          "telephone": "+27 72 973 4610",
+          "priceRange": "R300+",
+          "openingHours": "Mo-Su 00:00-24:00",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+27 74 866 6019",
+            "contactType": "dispatch",
+            "areaServed": "ZA",
+            "availableLanguage": "en"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "136 2nd St, Randjespark",
+            "addressLocality": "Midrand",
+            "postalCode": "1685",
+            "addressCountry": "ZA"
+          },
+          "areaServed": [
+            {"@type": "City", "name": "Johannesburg"},
+            {"@type": "City", "name": "Sandton"},
+            {"@type": "City", "name": "Midrand"},
+            {"@type": "AdministrativeArea", "name": "Bryanston"},
+            {"@type": "AdministrativeArea", "name": "Rivonia"},
+            {"@type": "AdministrativeArea", "name": "Morningside"},
+            {"@type": "AdministrativeArea", "name": "Fourways"},
+            {"@type": "AdministrativeArea", "name": "Randburg"},
+            {"@type": "AdministrativeArea", "name": "Rosebank"},
+            {"@type": "AdministrativeArea", "name": "Sunninghill"}
+          ]
+        }
+      ]
     }
     </script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩺</text></svg>">
@@ -39,7 +91,8 @@
     <meta name="theme-color" content="#0052cc">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/si-widget.css">
+    <link rel="preload" href="assets/si-widget.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="assets/si-widget.css"></noscript>
     <style>
         :root {
             --primary: #0052cc;
@@ -292,7 +345,7 @@
             box-shadow: 0 4px 16px rgba(0,82,204,0.12);
         }
         .how-step.active .how-number { background: var(--primary); color: var(--white); }
-        .how-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
+        .how-step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; }
         .how-step p { font-size: 0.8rem; color: var(--text-muted); }
 
         /* ===== COFOUNDERS ===== */
@@ -558,24 +611,68 @@
     <div class="how-grid">
         <div class="how-step reveal">
             <div class="how-number">1</div>
-            <h4>Create Account</h4>
+            <h3>Create Account</h3>
             <p>Sign up in under 30 seconds as a patient or doctor.</p>
         </div>
         <div class="how-step reveal reveal-delay-1">
             <div class="how-number active">2</div>
-            <h4>Choose a Doctor</h4>
+            <h3>Choose a Doctor</h3>
             <p>Browse verified profiles, specialties, and real-time availability.</p>
         </div>
         <div class="how-step reveal reveal-delay-2">
             <div class="how-number">3</div>
-            <h4>Consult</h4>
+            <h3>Consult</h3>
             <p>Connect via secure video, chat, or book an in-person home visit.</p>
         </div>
         <div class="how-step reveal reveal-delay-3">
             <div class="how-number">4</div>
-            <h4>Get Treatment</h4>
+            <h3>Get Treatment</h3>
             <p>Receive prescriptions, referrals, and sick notes — all digitally.</p>
         </div>
+    </div>
+</section>
+
+<!-- SANDTON COVERAGE -->
+<section class="section features-section" id="sandton-care">
+    <div class="section-header">
+        <div class="section-badge"><i class="fas fa-location-dot"></i> Sandton &amp; Johannesburg</div>
+        <h2 class="section-title">Online Doctors Serving Sandton</h2>
+        <p class="section-subtitle">Video consultations work anywhere with a connection. Home visits are offered across Sandton and greater Johannesburg where a participating practitioner is available.</p>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card reveal">
+            <div class="feature-icon blue"><i class="fas fa-video"></i></div>
+            <h3>Video Consultations from R300</h3>
+            <p>Consult a verified doctor face-to-face without leaving home or the office. Video consultations start from R300, with the final price confirmed before you pay. Evening and weekend availability means healthcare that fits around Sandton working hours, not the other way round.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+            <div class="feature-icon green"><i class="fas fa-house-medical"></i></div>
+            <h3>Doctor Home Visits from R800</h3>
+            <p>When you need a doctor at your door, home visits start from R800 across Sandton, Rivonia, Morningside, Bryanston, Fourways, Randburg and surrounding suburbs. Availability varies by suburb and time of day, so request early for same-day visits.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+            <div class="feature-icon teal"><i class="fas fa-file-prescription"></i></div>
+            <h3>Prescriptions, Referrals &amp; Sick Notes</h3>
+            <p>Where clinically appropriate, your consulting doctor issues digital prescriptions sent directly to your preferred pharmacy, along with specialist referrals and sick notes. Follow-up visits start from R500 for continued care and check-ups.</p>
+        </div>
+        <div class="feature-card reveal">
+            <div class="feature-icon blue"><i class="fas fa-user-shield"></i></div>
+            <h3>HPCSA-Verified Doctors Only</h3>
+            <p>Every practitioner on the platform is HPCSA-registered and manually verified before consulting. The platform was co-founded by a practicing medical doctor, and medical standards are overseen by our medical director — not by an algorithm.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+            <div class="feature-icon green"><i class="fas fa-clock"></i></div>
+            <h3>Book Online Any Time</h3>
+            <p>Registration takes under a minute and booking is available online around the clock. Browse verified doctor profiles, check real-time availability, and choose video, chat, or a home visit. Pay securely by card, with transparent pricing and no hidden fees.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+            <div class="feature-icon teal"><i class="fas fa-truck-medical"></i></div>
+            <h3>Emergencies Need Emergency Care</h3>
+            <p>Online consultations are for everyday healthcare, not emergencies. If you or someone near you faces a life-threatening situation, call South African emergency services on 10177 or go directly to your nearest emergency department.</p>
+        </div>
+    </div>
+    <div style="max-width:720px;margin:2.5rem auto 0;color:var(--text-muted);font-size:.95rem;line-height:1.75;">
+        <p>Doctors on Wheels suits anyone who values their time: Sandton professionals fitting a consultation between meetings, parents avoiding a waiting room full of flu with a sick child, and elderly patients for whom travel across Johannesburg traffic is itself a health risk. Registration takes under a minute, doctors' profiles show specialties and real-time availability, and every price is confirmed before you pay — video consultations from R300, follow-ups from R500, home visits from R800. Card payments are processed securely, and medical aid claims are supported where applicable. Behind the platform stands a practicing medical doctor as medical director, so clinical standards are set by medicine, not software. Whether you need a repeat prescription, a referral to a Sandton specialist, or a doctor at your door tonight, the fastest route starts with one booking.</p>
     </div>
 </section>
 
@@ -596,7 +693,7 @@
                 <div style="font-weight:600; color:var(--text); margin-bottom:0.25rem;">Practice Details</div>
                 <div>136 2nd St, Randjespark, Midrand, 1685</div>
                 <div>Practice No: PCNS 1339370</div>
-                <div>072 973 4610</div>
+                <div>Tel: <a href="tel:+27729734610" style="color:inherit;">072 973 4610</a> &middot; Dispatch: <a href="tel:+27748666019" style="color:inherit;">074 866 6019</a></div>
             </div>
         </div>
         <div class="team-card reveal reveal-delay-1">
