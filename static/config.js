@@ -359,6 +359,10 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                 const { data: doctor } = await supabase.from('Doctors').select('*').eq('id', body.doctor_id).single();
                 if (!doctor) throw new Error('Doctor not found');
 
+                // Double-booking guard
+                const { data: existing } = await supabase.from('appointments').select('id').eq('doctor_id', body.doctor_id).eq('timestamp', body.timestamp);
+                if (existing && existing.length > 0) throw new Error('Slot already booked');
+
                 const isNurseDoc = (doctor.specialty && doctor.specialty.toLowerCase().includes('nurse')) || 
                                    (doctor.name && doctor.name.toLowerCase().includes('nurse'));
                 
