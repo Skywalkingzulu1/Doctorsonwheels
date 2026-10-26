@@ -596,11 +596,13 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                 const emulatedEmail = localStorage.getItem('emulated_user_email');
                 if (!emulatedEmail) throw new Error('Not authenticated');
 
-                const urlObj = new URL(path, window.location.origin);
-                const q = urlObj.searchParams.get('q');
+                const page = parseInt(urlObj.searchParams.get('page') || '1', 10);
+                const pageSize = Math.min(parseInt(urlObj.searchParams.get('limit') || '25', 10), 100);
+                const from = (page - 1) * pageSize;
+                const to = from + pageSize - 1;
 
-                let query = supabase.from('Profiles').select('*');
-                const { data: users, error } = await query;
+                let query = supabase.from('Profiles').select('*', { count: 'exact' }).range(from, to);
+                const { data: users, error, count } = await query;
                 if (error) throw new Error(error.message);
 
                 let filtered = users || [];
