@@ -36,6 +36,69 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
 
     // Capture standard API endpoints and emulate them using client-side Supabase
     const originalFetch = window.fetch;
+
+    const PASSWORD_STORE_KEY = 'dow_password_credentials';
+    const DEMO_CREDENTIALS = {
+        'test3@sbtiinnovation.co.za': 'pass',
+        'sam@sbtiinnovation.co.za': 'test123'
+    };
+
+    function getPasswordStore() {
+        try {
+            return JSON.parse(localStorage.getItem(PASSWORD_STORE_KEY) || '{}');
+        } catch {
+            return {};
+        }
+    }
+
+    function savePasswordStore(store) {
+        localStorage.setItem(PASSWORD_STORE_KEY, JSON.stringify(store));
+    }
+
+    function generateSalt() {
+        const bytes = new Uint8Array(16);
+        crypto.getRandomValues(bytes);
+        return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function hashPassword(password, salt) {
+        const encoder = new TextEncoder();
+        const keyMaterial = await crypto.subtle.importKey(
+            'raw',
+            encoder.encode(password),
+            'PBKDF2',
+            false,
+            ['deriveBits']
+        );
+        const bits = await crypto.subtle.deriveBits(
+            {
+                name: 'PBKDF2',
+                salt: encoder.encode(salt),
+                iterations: 100000,
+                hash: 'SHA-256'
+            },
+            keyMaterial,
+            256
+        );
+        return Array.from(new Uint8Array(bits)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    async function storePassword(email, password) {
+        const store = getPasswordStore();
+        const salt = generateSalt();
+        store[email] = { salt, hash: await hashPassword(password, salt) };
+        savePasswordStore(store);
+    }
+
+    async function verifyPassword(email, password) {
+        if (!password) return false;
+        const stored = getPasswordStore()[email];
+        if (stored && stored.salt && stored.hash) {
+            return (await hashPassword(password, stored.salt)) === stored.hash;
+        }
+        return DEMO_CREDENTIALS[email] === password;
+    }
+
     window.fetch = async function(resource, init) {
         const url = typeof resource === 'string' ? resource : resource.url;
         if (url.includes('/api/')) {
@@ -55,8 +118,13 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
             if (path === '/api/auth/register' && method === 'POST') {
                 const body = JSON.parse(init.body);
                 const email = body.email;
+                const password = body.password;
                 const name = body.name;
                 const role = (body.role || 'PATIENT').toUpperCase();
+
+                if (!password) {
+                    throw new Error('Password is required');
+                }
 
                 // Check if profile already exists in Profiles database table
                 let { data: existingProfile } = await supabase
@@ -89,6 +157,8 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                     console.error("Supabase Profile Insert Error:", pError);
                     throw new Error(pError.message);
                 }
+
+                await storePassword(email, password);
 
                 if (role === 'DOCTOR') {
                     let { data: maxDocIdData } = await supabase.from('Doctors').select('id').order('id', { ascending: false }).limit(1);
@@ -148,6 +218,10 @@ window.SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXB
                 let originalEmail = email;
                 if (email === 'test3@test.com') email = 'test3@sbtiinnovation.co.za';
                 if (email === 'sam@docmail.com') email = 'sam@sbtiinnovation.co.za';
+
+                if (!password || !(await verifyPassword(email, password))) {
+                    return new Response(JSON.stringify({ detail: 'Invalid credentials' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+                }
 
                 // Check if profile exists in Profiles table
                 console.log("Checking profile in database for email:", email);
