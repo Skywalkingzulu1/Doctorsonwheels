@@ -110,11 +110,11 @@
                 const user = await userRes.json();
                 
                 if (user.role === 'ADMIN') {
-                    window.location.href = 'admin_live.html';
+                    window.location.href = 'no_admin.html';
                 } else if (user.role === 'DOCTOR') {
-                    window.location.href = 'doctor_dashboard.html';
+                    window.location.href = 'no_doctor-dashboard.html';
                 } else {
-                    window.location.href = 'patient_dashboard.html';
+                    window.location.href = 'no_patient_dashboard.html';
                 }
             } catch (err) {
                 errorDiv.textContent = err.message;
